@@ -1,3 +1,3 @@
 # SimpleChat
 
-## Frontend+Backend
+## Backend written on Golang
