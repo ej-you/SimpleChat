@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 
-const FindUser = () => {
+const FindUser = () => {	
 	const nav = useNavigate()
 	return (
 		<div className="container flex flex-col justify-center h-screen items-center text-center gap-10">
