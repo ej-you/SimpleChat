@@ -1,9 +1,11 @@
+import { useNavigate } from 'react-router-dom'
 import Auth from './Auth'
 
 const SignIn = () => {
+  const nav = useNavigate()
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log('sing in')
+    nav('/finduser')
   }
 	return (
 		<Auth handleSubmit={handleSubmit}/>

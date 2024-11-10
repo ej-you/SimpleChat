@@ -23,9 +23,9 @@ export default {
       }
     },
     fontSize: {
-      sm: '0.9rem',
-      base: '1.15rem',
-      xl: '2.25rem',
+      sm: '0.8rem',
+      base: '1rem',
+      xl: '1.8rem',
     }
   },
   plugins: [],
