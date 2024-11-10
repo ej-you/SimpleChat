@@ -1,10 +1,19 @@
-import { Link } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 
 const Messanger = () => {
+	const nav = useNavigate()
+
+	useEffect(() =>{
+    if(!localStorage.getItem('token')){
+      nav('/signin')
+    }
+  },[nav])
+	
 	return (
 		<div className="h-screen flex flex-col py-10 px-60">
     <header className='flex items-center justify-center relative'>
-        <Link to='/finduser' className='absolute left-0 text-primary underline cursor-pointer font-bold'>Back</Link>
+        <Link to='/' className='absolute left-0 text-primary underline cursor-pointer font-bold'>Back</Link>
         <h1 className='text-title text-xl font-bold'>Username</h1>
     </header>
     <div className="main flex flex-col flex-grow py-10 gap-4 overflow-y-scroll">
