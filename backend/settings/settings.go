@@ -1,0 +1,52 @@
+package settings
+
+import (
+	"log"
+	"os"
+	"strings"
+	"time"
+
+	"github.com/joho/godotenv"
+)
+
+
+// загрузка переменных окружения
+var _ error = godotenv.Load("./.env")
+
+
+// распаковка переменных окружения
+var Port string = os.Getenv("GO_PORT")
+var SecretForJWT string = os.Getenv("SECRET")
+
+var CorsAllowedOrigins []string = strings.Split(os.Getenv("CORS_ALLOWED_ORIGINS"), ",")
+var CorsAllowedMethods []string = strings.Split(os.Getenv("CORS_ALLOWED_METHODS"), ",")
+var CorsAllowCredentials bool = false
+
+// время истечения действия токена
+var TokenExpiredTime time.Duration = time.Minute * 1
+
+// путь до SQLite3 БД - os.Getenv("PATH_DB") || "./db.sqlite3"
+var PathDB = func() string {
+	dbPathEnv, isExists := os.LookupEnv("PATH_DB")
+	// если перменная окружения не указана
+	if !isExists {
+		return "./db.sqlite3"
+	}
+	return dbPathEnv
+}()
+
+// формат логов
+var LogFmt string = "[${time_rfc3339}] -- ${status} -- from ${remote_ip} to ${host} (${method} ${uri}) [time: ${latency_human}] | ${bytes_in} ${bytes_out} | error: ${error} | -> User-Agent: ${user_agent}\n"
+// формат времени
+var TimeFmt string = "06-01-02 15:04:05 -07"
+
+// логеры
+var InfoLog *log.Logger = log.New(os.Stdout, "[INFO]\t", log.Ldate|log.Ltime)
+var ErrorLog *log.Logger = log.New(os.Stderr, "[ERROR]\t", log.Ldate|log.Ltime|log.Lshortfile)
+
+// функция для обработки критических ошибок
+func DieIf(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
