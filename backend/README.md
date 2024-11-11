@@ -3,4 +3,6 @@
 ## Backend written on Golang
 
 ### Swagger Docs:
-`http://1.1.1.1/api/swagger`
+```text
+http://150.241.82.68/api/swagger/index.html
+```
