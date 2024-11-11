@@ -21,11 +21,11 @@ func CustomJWTErrorHandler(context echo.Context, err error) error {
 	}
 
 	// токен не был отправлен в куках (токен и запись в куках истекли)
-	tokenExtractionError, ok := err.(*echojwt.TokenExtractionError)
+	_, ok = err.(*echojwt.TokenExtractionError)
 	if ok {
 		httpError := &echo.HTTPError{
 			Code: http.StatusUnauthorized,
-			Message: map[string]string{"token": tokenExtractionError.Error()},
+			Message: map[string]string{"token": "missing auth cookie"},
 		}
 		return httpError
 	}

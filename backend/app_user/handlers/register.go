@@ -12,6 +12,19 @@ import (
 )
 
 
+// эндпоинт для регистрации юзера
+//	@Summary		Register user
+//	@Description	Register new user with form
+//	@Router			/user/register [post]
+//	@ID				user-register
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Param			RegisterUserIn	body		serializers.RegisterUserIn	true	"Register params"
+//	@Success		201				{object}	models.User
+//	@Failure		400				{object}	errors.UserRegister400
+//	@Failure		409				{object}	errors.UserRegister409
+//	@Failure		500				{object}	errors.General500
 func Register(context echo.Context) error {
 	var err error
 	var dataIn serializers.RegisterUserIn

@@ -8,8 +8,8 @@ import (
 	echo "github.com/labstack/echo/v4"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
 
-	// echoSwagger "github.com/swaggo/echo-swagger"
-	// _ "SimpleChat/backend/docs"
+	echoSwagger "github.com/swaggo/echo-swagger"
+	_ "SimpleChat/backend/docs"
 
 	coreErrorHandler "SimpleChat/backend/core/error_handler"
 	coreUrls "SimpleChat/backend/core/urls"
@@ -20,22 +20,18 @@ import (
 
 
 // Настройка Swagger документации
-//	@Title						Knofu Go API
+//	@Title						SimpleChat Go API
 //	@Version					1.0
-//	@Description				This is a Knofu API written on Golang using Echo.
-//	@Host						localhost:8000
+//	@Description				This is a SimpleChat API written on Golang using Echo.
+//	@Host						127.0.0.1:8000
 //	@BasePath					/api
 //	@Schemes					http
 //	@Accept						json
 //	@Produce					json
-//	@SecurityDefinitions.apiKey	Access
-//	@In							header
-//	@Name						Authorization
-//	@Description				JWT security accessToken. Please add it in the format "Bearer {AccessToken}" to authorize your requests.
-//	@SecurityDefinitions.apiKey	Refresh
-//	@In							header
-//	@Name						Authorization
-//	@Description				JWT security RefreshToken. Use it like "Bearer {RefreshToken}" to obtain new AccessToken.
+//	@SecurityDefinitions.apiKey	CookieAuth
+//	@In							cookie
+//	@Name						auth
+//	@Description				JWT security token. Cookie is automatic added after auth is done (login/register).
 func main() {
 	echoApp := echo.New()
 	echoApp.HideBanner = true
@@ -80,8 +76,8 @@ func main() {
 	// настройка роутеров для эндпоинтов
 	coreUrls.InitUrlRouters(echoApp)
 
-	// натсройка Swagger документации
-	// echoApp.GET("/api/swagger/*", echoSwagger.WrapHandler)
+	// настройка Swagger документации
+	echoApp.GET("/api/swagger/*", echoSwagger.WrapHandler)
 
 	// запуск приложения
 	echoApp.Logger.Fatal(echoApp.Start(fmt.Sprintf(":%s", settings.Port)))

@@ -12,6 +12,20 @@ import (
 )
 
 
+// эндпоинт для входа юзера
+//	@Summary		Login user
+//	@Description	Login existing user by email and password
+//	@Router			/user/login [post]
+//	@ID				user-login
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Param			LoginUserIn	body		serializers.LoginUserIn	true	"Login params"
+//	@Success		200			{object}	models.User
+//	@Failure		400			{object}	errors.UserLogin400
+//	@Failure		401			{object}	errors.UserLogin401
+//	@Failure		404			{object}	errors.UserLogin404
+//	@Failure		500			{object}	errors.General500
 func Login(context echo.Context) error {
 	var err error
 	var dataIn serializers.LoginUserIn
@@ -31,7 +45,7 @@ func Login(context echo.Context) error {
 	}
 	// проверка на совпадение введённого пароля и хэша из БД
 	if ok := services.PasswordIsCorrect(dataIn.Password, userFromDB.Password); !ok {
-		return echo.NewHTTPError(400, map[string]string{"password": "Invalid password"})
+		return echo.NewHTTPError(401, map[string]string{"password": "invalid password"})
 	}
 	// получение куки авторизации
 	var newAuthCookie *http.Cookie

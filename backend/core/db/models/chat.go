@@ -30,7 +30,7 @@ type Message struct {
 	Content		string 		`gorm:"not null; type: LONGTEXT" json:"content"`
 	CreatedAt	time.Time 	`gorm:"not null; autoCreateTime:true" json:"createdAt"`
 	// ассоциация c чатом, к которому принадлежат сообщения
-	Chat     	Chat     	`gorm:"foreignKey:ChatID; constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"-"`
+	// Chat     	Chat     	`gorm:"foreignKey:ChatID; constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"-"`
 	// ассоциация отправителя сообщения
 	Sender 		User 		`gorm:"foreignKey:SenderID; constraint:OnUpdate:CASCADE,OnDelete:CASCADE" json:"sender"`
 }

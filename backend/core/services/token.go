@@ -15,13 +15,13 @@ import (
 // создание токена для юзера
 func getToken(userID uuid.UUID) (string, error) {
 	tokenStruct := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id": userID,
+		"userID": userID,
 		"exp": time.Now().Add(settings.TokenExpiredTime).Unix(),
 	})
 
 	tokenString, err := tokenStruct.SignedString([]byte(settings.SecretForJWT))
 	if err != nil {
-		return "", echo.NewHTTPError(500, map[string]string{"token": err.Error()})
+		return "", echo.NewHTTPError(500, map[string]string{"obtainToken": err.Error()})
 	}
 
 	return tokenString, nil
