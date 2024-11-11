@@ -4,15 +4,8 @@
 
 FROM golang:1.22.4-alpine3.20 AS build
 
-# tells the C compiler to enable support for large files, allowing the use
-# of 64-bit versions of file handling functions such as pread64 and pwrite64
-ENV CGO_CFLAGS="-D_LARGEFILE64_SOURCE"
-ENV CGO_LDFLAGS="-D_LARGEFILE64_SOURCE"
-
 # install make util for Makefile
 RUN apk add --no-cache make
-# install required packages for supporting CGo
-RUN apk add --no-cache build-base
 
 # set up workdir
 RUN cd /go/src
