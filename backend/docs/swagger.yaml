@@ -1,0 +1,329 @@
+basePath: /api
+consumes:
+- application/json
+definitions:
+  errors.ChatRestricted401:
+    description: ошибка отсутствия куков (истёк токен и соответственно куки авторизации
+      вместе с ним)
+    properties:
+      errors:
+        additionalProperties:
+          type: string
+        example:
+          token: ' missing auth cookie'
+        type: object
+      path:
+        example: /api/chat/restricted
+        type: string
+      status:
+        example: error
+        type: string
+      statusCode:
+        example: 401
+        type: integer
+      timestamp:
+        example: 24-11-11 11:57:28 +03
+        type: string
+    type: object
+  errors.General500:
+    description: обычная пятисотка от сервера, которую никто не ждёт
+    properties:
+      errors:
+        additionalProperties:
+          type: string
+        example:
+          unknown: ' some error desc'
+        type: object
+      path:
+        example: /api/smth/shit
+        type: string
+      status:
+        example: error
+        type: string
+      statusCode:
+        example: 500
+        type: integer
+      timestamp:
+        example: 24-11-11 11:57:28 +03
+        type: string
+    type: object
+  errors.UserLogin400:
+    description: ошибка валидации входных данных
+    properties:
+      errors:
+        additionalProperties:
+          type: string
+        example:
+          username: ' username field must not be blank'
+        type: object
+      path:
+        example: /api/user/login
+        type: string
+      status:
+        example: error
+        type: string
+      statusCode:
+        example: 400
+        type: integer
+      timestamp:
+        example: 24-11-11 11:57:28 +03
+        type: string
+    type: object
+  errors.UserLogin401:
+    description: ошибка неверного пароля
+    properties:
+      errors:
+        additionalProperties:
+          type: string
+        example:
+          password: ' invalid password'
+        type: object
+      path:
+        example: /api/user/login
+        type: string
+      status:
+        example: error
+        type: string
+      statusCode:
+        example: 401
+        type: integer
+      timestamp:
+        example: 24-11-11 11:57:28 +03
+        type: string
+    type: object
+  errors.UserLogin404:
+    description: ошибка ненахождения юзера с таким логином в БД
+    properties:
+      errors:
+        additionalProperties:
+          type: string
+        example:
+          getUser: ' user with such username was not found'
+        type: object
+      path:
+        example: /api/user/login
+        type: string
+      status:
+        example: error
+        type: string
+      statusCode:
+        example: 404
+        type: integer
+      timestamp:
+        example: 24-11-11 11:57:28 +03
+        type: string
+    type: object
+  errors.UserRegister400:
+    description: ошибка валидации входных данных
+    properties:
+      errors:
+        additionalProperties:
+          type: string
+        example:
+          password: ' password field must not be blank'
+        type: object
+      path:
+        example: /api/user/register
+        type: string
+      status:
+        example: error
+        type: string
+      statusCode:
+        example: 400
+        type: integer
+      timestamp:
+        example: 24-11-11 11:57:28 +03
+        type: string
+    type: object
+  errors.UserRegister409:
+    description: ошибка регистрации юзера с уже существующим (занятым) логином
+    properties:
+      errors:
+        additionalProperties:
+          type: string
+        example:
+          username: ' user with such username already exists'
+        type: object
+      path:
+        example: /api/user/register
+        type: string
+      status:
+        example: error
+        type: string
+      statusCode:
+        example: 409
+        type: integer
+      timestamp:
+        example: 24-11-11 11:57:28 +03
+        type: string
+    type: object
+  models.User:
+    description: выходные даные входа и регистрации юзера
+    properties:
+      id:
+        description: uuid юзера
+        example: e2f53f31-0598-4e36-b25d-41bd665764d1
+        type: string
+      username:
+        description: логин юзера
+        example: vasya_2007
+        type: string
+    type: object
+  serializers.LoginUserIn:
+    description: входные данные для входа юзера
+    properties:
+      password:
+        description: пароль юзера
+        example: qwerty123
+        type: string
+      username:
+        description: логин юзера
+        example: vasya_2007
+        type: string
+    type: object
+  serializers.RegisterUserIn:
+    description: входные данные регистрации юзера
+    properties:
+      password:
+        description: пароль юзера
+        example: qwerty123
+        maxLength: 50
+        minLength: 8
+        type: string
+      username:
+        description: логин юзера
+        example: vasya_2007
+        maxLength: 50
+        type: string
+    type: object
+host: 127.0.0.1:8000
+info:
+  contact: {}
+  description: This is a SimpleChat API written on Golang using Echo.
+  title: SimpleChat Go API
+  version: "1.0"
+paths:
+  /chat/free:
+    get:
+      description: Does not require auth cookie
+      operationId: chat-free
+      responses:
+        "200":
+          description: Free endpoint
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.General500'
+      summary: Free endpoint for test cookie auth
+      tags:
+      - chat
+  /chat/restricted:
+    get:
+      description: Requires auth cookie
+      operationId: chat-restricted
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.ChatRestricted401'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.General500'
+      summary: Restricted endpoint for test cookie auth
+      tags:
+      - chat
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Login existing user by email and password
+      operationId: user-login
+      parameters:
+      - description: Login params
+        in: body
+        name: LoginUserIn
+        required: true
+        schema:
+          $ref: '#/definitions/serializers.LoginUserIn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.UserLogin400'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.UserLogin401'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.UserLogin404'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.General500'
+      summary: Login user
+      tags:
+      - user
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      description: Register new user with form
+      operationId: user-register
+      parameters:
+      - description: Register params
+        in: body
+        name: RegisterUserIn
+        required: true
+        schema:
+          $ref: '#/definitions/serializers.RegisterUserIn'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.UserRegister400'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/errors.UserRegister409'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.General500'
+      summary: Register user
+      tags:
+      - user
+produces:
+- application/json
+schemes:
+- http
+securityDefinitions:
+  CookieAuth:
+    description: JWT security token. Cookie is automatic added after auth is done
+      (login/register).
+    in: cookie
+    name: auth
+    type: apiKey
+swagger: "2.0"
