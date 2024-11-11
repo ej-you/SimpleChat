@@ -36,6 +36,11 @@ RUN apk add --no-cache make
 # make dir for logs
 RUN mkdir /logs
 
+# set up DB
+RUN mkdir /root/db
+ENV PATH_DB="/root/db/db.sqlite3"
+
+
 WORKDIR /root
 # copy compiled file and Makefile to run app
 COPY --from=build /go/src/github.com/echo-tokyo/TaskManager/backend_go/Makefile .
