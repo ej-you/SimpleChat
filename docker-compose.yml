@@ -7,6 +7,9 @@ services:
     restart: always
     env_file:
       - .env
+    volumes:
+      - sqlite-db:/root/db/db.sqlite3:rw
+      - logs:/logs:rw
     expose:
       - "8000"
     networks:
@@ -34,3 +37,7 @@ networks:
     ipam:
       config:
         - subnet: 172.16.1.0/24
+
+volumes:
+  sqlite-db:
+  logs:
