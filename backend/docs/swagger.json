@@ -15,7 +15,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "127.0.0.1:8000",
+    "host": "150.241.82.68",
     "basePath": "/api",
     "paths": {
         "/chat/free": {

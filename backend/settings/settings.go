@@ -20,7 +20,7 @@ var SecretForJWT string = os.Getenv("SECRET")
 
 var CorsAllowedOrigins []string = strings.Split(os.Getenv("CORS_ALLOWED_ORIGINS"), ",")
 var CorsAllowedMethods []string = strings.Split(os.Getenv("CORS_ALLOWED_METHODS"), ",")
-var CorsAllowCredentials bool = false
+var CorsAllowCredentials bool = true
 
 // время истечения действия токена
 var TokenExpiredTime time.Duration = time.Minute * 1
