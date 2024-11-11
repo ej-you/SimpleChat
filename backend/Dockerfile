@@ -9,8 +9,8 @@ RUN apk add --no-cache make
 
 # set up workdir
 RUN cd /go/src
-RUN mkdir -p ./github.com/echo-tokyo/TaskManager/backend_go
-WORKDIR /go/src/github.com/echo-tokyo/TaskManager/backend_go
+RUN mkdir -p ./SimpleChat/backend
+WORKDIR /go/src/SimpleChat/backend
 
 # install dependences
 COPY ./go.mod .
@@ -43,8 +43,8 @@ ENV PATH_DB="/root/db/db.sqlite3"
 
 WORKDIR /root
 # copy compiled file and Makefile to run app
-COPY --from=build /go/src/github.com/echo-tokyo/TaskManager/backend_go/Makefile .
-COPY --from=build /go/src/github.com/echo-tokyo/TaskManager/backend_go/go_app .
+COPY --from=build /go/src/SimpleChat/backend/Makefile .
+COPY --from=build /go/src/SimpleChat/backend/go_app .
 
 # run app
 CMD ["make", "prod"]
