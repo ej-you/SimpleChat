@@ -36,8 +36,7 @@ RUN apk add --no-cache make
 # make dir for logs
 RUN mkdir /logs
 
-# set up DB
-RUN mkdir /root/db
+# set up DB path
 ENV PATH_DB="/root/db/db.sqlite3"
 
 
