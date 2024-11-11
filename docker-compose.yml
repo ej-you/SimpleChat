@@ -1,0 +1,36 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: simple_chat_backend
+    restart: always
+    env_file:
+      - .env
+    expose:
+      - "8000"
+    networks:
+      proj_network:
+        ipv4_address: 172.16.1.5
+
+  web_server:
+    build:
+      context: .
+      dockerfile: ./web_server/Dockerfile
+    container_name: simple_chat_nginx
+    restart: always
+    ports:
+      - "80:80"
+    networks:
+      proj_network:
+        ipv4_address: 172.16.1.6
+    depends_on:
+      - backend
+
+
+networks:
+  proj_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.1.0/24
