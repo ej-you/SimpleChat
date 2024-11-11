@@ -196,7 +196,7 @@ definitions:
         maxLength: 50
         type: string
     type: object
-host: 127.0.0.1:8000
+host: 127.0.0.1
 info:
   contact: {}
   description: This is a SimpleChat API written on Golang using Echo.
