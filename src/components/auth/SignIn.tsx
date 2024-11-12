@@ -2,11 +2,14 @@ import { useNavigate } from 'react-router-dom'
 import Auth from './Auth'
 import { FieldValues } from 'react-hook-form'
 import axios from 'axios'
+import { useState } from 'react'
 
 const SignIn = () => {
   const nav = useNavigate()
+  const [errName, setErrName] = useState<string>('')
 
   const onSubmit = async (data: FieldValues) => {
+    setErrName('')
 		try {
 			const res = await axios.post('http://150.241.82.68/user/login', data)
 			localStorage.setItem('registered', '')
@@ -14,11 +17,12 @@ const SignIn = () => {
 			nav('/')
 		} catch(err) {
 			console.error(err)
+      setErrName((err as Error).message)
 		}
   }
 
 	return (
-		<Auth onSubmit={onSubmit}/>
+		<Auth onSubmit={onSubmit} errName={errName}/>
 	)
 }
 

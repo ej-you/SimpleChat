@@ -16,6 +16,7 @@ export default {
         '800' : '#313131',
       },
       'primary' : '#C9E956',
+      'error' : 'red',
       'title' : '#F9FFE9',
       subtitle: {
         'gray': '#7F8178',
