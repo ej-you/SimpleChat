@@ -5,7 +5,7 @@ function App() {
   const nav = useNavigate()
 
   useEffect(() =>{
-    if(!localStorage.getItem('token')){
+    if(!localStorage.getItem('registered')){
       nav('/signin')
     }
   },[nav])
