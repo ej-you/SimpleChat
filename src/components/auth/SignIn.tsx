@@ -11,8 +11,8 @@ const SignIn = () => {
   const onSubmit = async (data: FieldValues) => {
     setErrName('')
 		try {
-			const res = await axios.post('http://150.241.82.68/user/login', data)
-			localStorage.setItem('registered', '')
+			const res = await axios.post('http://150.241.82.68/api/user/login', data)
+			localStorage.setItem('registered', 'true')
 			console.log(res)
 			nav('/')
 		} catch(err) {
