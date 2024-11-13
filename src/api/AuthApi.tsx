@@ -3,6 +3,7 @@ import { FieldValues } from 'react-hook-form'
 import axios from 'axios'
 import { useErrorStore } from '../store/store'
 import Auth from '../components/auth/Auth'
+import { useEffect } from 'react'
 
 interface IProps {
 	apiUrl: string
@@ -11,6 +12,10 @@ interface IProps {
 const AuthApi:React.FC<IProps> = ({ apiUrl }) => {
   const nav = useNavigate()
   const setErrorContent = useErrorStore(state => state.setErrorContent)
+
+  useEffect(() => {
+    setErrorContent('')
+  }, [setErrorContent])
 
   const onSubmit = async (data: FieldValues) => {
     setErrorContent('')
