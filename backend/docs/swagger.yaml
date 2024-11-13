@@ -2,7 +2,29 @@ basePath: /api
 consumes:
 - application/json
 definitions:
-  errors.ChatRestricted401:
+  errors.ChatGetMessages400:
+    description: ошибка, возникающая при указании второго участника чата как себя
+    properties:
+      errors:
+        additionalProperties:
+          type: string
+        example:
+          getMessages: another chat participant cannot be the same user
+        type: object
+      path:
+        example: /api/chat/get-messages
+        type: string
+      status:
+        example: error
+        type: string
+      statusCode:
+        example: 400
+        type: integer
+      timestamp:
+        example: 24-11-11 11:57:28 +03
+        type: string
+    type: object
+  errors.ChatGetMessages401:
     description: ошибка отсутствия куков (истёк токен и соответственно куки авторизации
       вместе с ним)
     properties:
@@ -10,16 +32,38 @@ definitions:
         additionalProperties:
           type: string
         example:
-          token: ' missing auth cookie'
+          token: missing auth cookie
         type: object
       path:
-        example: /api/chat/restricted
+        example: /api/chat/get-messages
         type: string
       status:
         example: error
         type: string
       statusCode:
         example: 401
+        type: integer
+      timestamp:
+        example: 24-11-11 11:57:28 +03
+        type: string
+    type: object
+  errors.ChatGetMessages404:
+    description: ошибка ненахождения юзера с таким логином в БД
+    properties:
+      errors:
+        additionalProperties:
+          type: string
+        example:
+          getUser: user with such username was not found
+        type: object
+      path:
+        example: /api/chat/get-messages
+        type: string
+      status:
+        example: error
+        type: string
+      statusCode:
+        example: 404
         type: integer
       timestamp:
         example: 24-11-11 11:57:28 +03
@@ -32,7 +76,7 @@ definitions:
         additionalProperties:
           type: string
         example:
-          unknown: ' some error desc'
+          unknown: some error desc
         type: object
       path:
         example: /api/smth/shit
@@ -54,7 +98,7 @@ definitions:
         additionalProperties:
           type: string
         example:
-          username: ' username field must not be blank'
+          username: username field must not be blank
         type: object
       path:
         example: /api/user/login
@@ -76,7 +120,7 @@ definitions:
         additionalProperties:
           type: string
         example:
-          password: ' invalid password'
+          password: invalid password
         type: object
       path:
         example: /api/user/login
@@ -98,7 +142,7 @@ definitions:
         additionalProperties:
           type: string
         example:
-          getUser: ' user with such username was not found'
+          getUser: user with such username was not found
         type: object
       path:
         example: /api/user/login
@@ -120,7 +164,7 @@ definitions:
         additionalProperties:
           type: string
         example:
-          password: ' password field must not be blank'
+          password: password field must not be blank
         type: object
       path:
         example: /api/user/register
@@ -142,7 +186,7 @@ definitions:
         additionalProperties:
           type: string
         example:
-          username: ' user with such username already exists'
+          username: user with such username already exists
         type: object
       path:
         example: /api/user/register
@@ -156,6 +200,38 @@ definitions:
       timestamp:
         example: 24-11-11 11:57:28 +03
         type: string
+    type: object
+  models.Chat:
+    properties:
+      id:
+        description: uuid чата
+        example: 0aafe1fd-0088-455b-9269-0307aae15bcc
+        type: string
+      messages:
+        description: сообщения чата
+        items:
+          $ref: '#/definitions/models.Message'
+        type: array
+      users:
+        description: участники чата
+        items:
+          $ref: '#/definitions/models.User'
+        type: array
+    type: object
+  models.Message:
+    properties:
+      content:
+        description: текст сообщения
+        example: sample message
+        type: string
+      createdAt:
+        description: время создания сообщения
+        example: "2024-11-13T12:34:56Z"
+        type: string
+      sender:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: отправитель сообщения
     type: object
   models.User:
     description: выходные даные входа и регистрации юзера
@@ -196,49 +272,50 @@ definitions:
         maxLength: 50
         type: string
     type: object
-host: 127.0.0.1
+host: 150.241.82.68
 info:
   contact: {}
   description: This is a SimpleChat API written on Golang using Echo.
   title: SimpleChat Go API
   version: "1.0"
 paths:
-  /chat/free:
+  /chat/get-messages/{username}:
     get:
-      description: Does not require auth cookie
-      operationId: chat-free
-      responses:
-        "200":
-          description: Free endpoint
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/errors.General500'
-      summary: Free endpoint for test cookie auth
-      tags:
-      - chat
-  /chat/restricted:
-    get:
-      description: Requires auth cookie
-      operationId: chat-restricted
+      consumes:
+      - text/plain
+      description: Get chat messages (also chat uuid && chat participants) by username
+        of another chat participant in path parameters
+      operationId: chat-get-messages
+      parameters:
+      - description: Get messages params
+        in: path
+        name: username
+        required: true
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.User'
+            $ref: '#/definitions/models.Chat'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.ChatGetMessages400'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/errors.ChatRestricted401'
+            $ref: '#/definitions/errors.ChatGetMessages401'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.ChatGetMessages404'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/errors.General500'
-      summary: Restricted endpoint for test cookie auth
+      summary: Get chat messages
       tags:
       - chat
   /user/login:

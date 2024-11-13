@@ -21,52 +21,52 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/chat/free": {
+        "/chat/get-messages/{username}": {
             "get": {
-                "description": "Does not require auth cookie",
-                "tags": [
-                    "chat"
+                "description": "Get chat messages (also chat uuid \u0026\u0026 chat participants) by username of another chat participant in path parameters",
+                "consumes": [
+                    "text/plain"
                 ],
-                "summary": "Free endpoint for test cookie auth",
-                "operationId": "chat-free",
-                "responses": {
-                    "200": {
-                        "description": "Free endpoint",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/errors.General500"
-                        }
-                    }
-                }
-            }
-        },
-        "/chat/restricted": {
-            "get": {
-                "description": "Requires auth cookie",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "chat"
                 ],
-                "summary": "Restricted endpoint for test cookie auth",
-                "operationId": "chat-restricted",
+                "summary": "Get chat messages",
+                "operationId": "chat-get-messages",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Get messages params",
+                        "name": "username",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.Chat"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ChatGetMessages400"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/errors.ChatRestricted401"
+                            "$ref": "#/definitions/errors.ChatGetMessages401"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.ChatGetMessages404"
                         }
                     },
                     "500": {
@@ -192,7 +192,38 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "errors.ChatRestricted401": {
+        "errors.ChatGetMessages400": {
+            "description": "ошибка, возникающая при указании второго участника чата как себя",
+            "type": "object",
+            "properties": {
+                "errors": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "getMessages": "another chat participant cannot be the same user"
+                    }
+                },
+                "path": {
+                    "type": "string",
+                    "example": "/api/chat/get-messages"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "error"
+                },
+                "statusCode": {
+                    "type": "integer",
+                    "example": 400
+                },
+                "timestamp": {
+                    "type": "string",
+                    "example": "24-11-11 11:57:28 +03"
+                }
+            }
+        },
+        "errors.ChatGetMessages401": {
             "description": "ошибка отсутствия куков (истёк токен и соответственно куки авторизации вместе с ним)",
             "type": "object",
             "properties": {
@@ -202,12 +233,12 @@ const docTemplate = `{
                         "type": "string"
                     },
                     "example": {
-                        "token": " missing auth cookie"
+                        "token": "missing auth cookie"
                     }
                 },
                 "path": {
                     "type": "string",
-                    "example": "/api/chat/restricted"
+                    "example": "/api/chat/get-messages"
                 },
                 "status": {
                     "type": "string",
@@ -216,6 +247,37 @@ const docTemplate = `{
                 "statusCode": {
                     "type": "integer",
                     "example": 401
+                },
+                "timestamp": {
+                    "type": "string",
+                    "example": "24-11-11 11:57:28 +03"
+                }
+            }
+        },
+        "errors.ChatGetMessages404": {
+            "description": "ошибка ненахождения юзера с таким логином в БД",
+            "type": "object",
+            "properties": {
+                "errors": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "getUser": "user with such username was not found"
+                    }
+                },
+                "path": {
+                    "type": "string",
+                    "example": "/api/chat/get-messages"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "error"
+                },
+                "statusCode": {
+                    "type": "integer",
+                    "example": 404
                 },
                 "timestamp": {
                     "type": "string",
@@ -233,7 +295,7 @@ const docTemplate = `{
                         "type": "string"
                     },
                     "example": {
-                        "unknown": " some error desc"
+                        "unknown": "some error desc"
                     }
                 },
                 "path": {
@@ -264,7 +326,7 @@ const docTemplate = `{
                         "type": "string"
                     },
                     "example": {
-                        "username": " username field must not be blank"
+                        "username": "username field must not be blank"
                     }
                 },
                 "path": {
@@ -295,7 +357,7 @@ const docTemplate = `{
                         "type": "string"
                     },
                     "example": {
-                        "password": " invalid password"
+                        "password": "invalid password"
                     }
                 },
                 "path": {
@@ -326,7 +388,7 @@ const docTemplate = `{
                         "type": "string"
                     },
                     "example": {
-                        "getUser": " user with such username was not found"
+                        "getUser": "user with such username was not found"
                     }
                 },
                 "path": {
@@ -357,7 +419,7 @@ const docTemplate = `{
                         "type": "string"
                     },
                     "example": {
-                        "password": " password field must not be blank"
+                        "password": "password field must not be blank"
                     }
                 },
                 "path": {
@@ -388,7 +450,7 @@ const docTemplate = `{
                         "type": "string"
                     },
                     "example": {
-                        "username": " user with such username already exists"
+                        "username": "user with such username already exists"
                     }
                 },
                 "path": {
@@ -406,6 +468,53 @@ const docTemplate = `{
                 "timestamp": {
                     "type": "string",
                     "example": "24-11-11 11:57:28 +03"
+                }
+            }
+        },
+        "models.Chat": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "uuid чата",
+                    "type": "string",
+                    "example": "0aafe1fd-0088-455b-9269-0307aae15bcc"
+                },
+                "messages": {
+                    "description": "сообщения чата",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Message"
+                    }
+                },
+                "users": {
+                    "description": "участники чата",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.User"
+                    }
+                }
+            }
+        },
+        "models.Message": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "description": "текст сообщения",
+                    "type": "string",
+                    "example": "sample message"
+                },
+                "createdAt": {
+                    "description": "время создания сообщения",
+                    "type": "string",
+                    "example": "2024-11-13T12:34:56Z"
+                },
+                "sender": {
+                    "description": "отправитель сообщения",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    ]
                 }
             }
         },
