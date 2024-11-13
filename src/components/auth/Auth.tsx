@@ -8,7 +8,6 @@ interface IProps {
 
 const Auth: React.FC<IProps> = ({onSubmit}) => {
   const errorContent = useErrorStore(state => state.errorContent)
-  console.log(errorContent)
   const {register, handleSubmit, formState: { errors }} = useForm()
 
 	return (

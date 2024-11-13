@@ -11,7 +11,6 @@ const Router = () => {
 				<Route path='/' element={<App />}></Route>
 				<Route path='/signin' element={<SignIn />}/>
 				<Route path='/signup' element={<SignUp />}/>
-				{/* <Route path='/finduser' element={<FindUser />}/> */}
 				<Route path='/messanger' element={<Messanger />}/>
 			</Routes>
 		</BrowserRouter>
