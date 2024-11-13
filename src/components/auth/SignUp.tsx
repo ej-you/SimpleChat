@@ -2,14 +2,14 @@ import { useNavigate } from 'react-router-dom'
 import Auth from './Auth'
 import axios from 'axios'
 import { FieldValues } from 'react-hook-form'
-import { useState } from 'react'
+import {useErrorStore} from '../../store/store'
 
 const SignUp = () => {
 	const nav = useNavigate()
-	const [errName, setErrName] = useState<string>('')
+	const setErrorContent = useErrorStore(state => state.setErrorContent)
 
 	const onSubmit = async (data: FieldValues) => {
-		setErrName('')
+		setErrorContent('')
 		try {
 			const res = await axios.post('http://150.241.82.68/api/user/register', data)
 			localStorage.setItem('registered', 'true')
@@ -17,12 +17,12 @@ const SignUp = () => {
 			nav('/')
 		} catch(err) {
 			console.error(err)
-			setErrName((err as Error).message)
+			setErrorContent((err as Error).message)
 		}
   }
 
 	return (
-		<Auth onSubmit={onSubmit} errName={errName} />
+		<Auth onSubmit={onSubmit} />
 	)
 }	
 

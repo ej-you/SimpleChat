@@ -1,19 +1,20 @@
 import { Link } from 'react-router-dom'
 import { FieldValues, useForm } from 'react-hook-form'
+import { useErrorStore } from '../../store/store'
 
 interface IProps {
   onSubmit: (data: FieldValues) => void
-  errName: string
 }
 
-const Auth: React.FC<IProps> = ({onSubmit, errName}) => {
-
+const Auth: React.FC<IProps> = ({onSubmit}) => {
+  const errorContent = useErrorStore(state => state.errorContent)
+  console.log(errorContent)
   const {register, handleSubmit, formState: { errors }} = useForm()
 
 	return (
     <>
-    {errName && 
-      <div className="box absolute left-1/2 -translate-x-1/2 top-2 w-fit bg-title px-2 rounded-lg"><p className='font-normal'>{errName}</p></div>
+    {errorContent && 
+      <div className="box absolute left-1/2 -translate-x-1/2 top-2 w-fit bg-title px-2 rounded-lg"><p className='font-normal'>{errorContent}</p></div>
     }
 		<div className="flex flex-col justify-center h-screen items-center text-center gap-12">
       <div className="flex flex-col gap-2">

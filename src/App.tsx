@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
-import axios from 'axios'
+// import axios from 'axios'
 
 function App() {
   const nav = useNavigate()
@@ -14,13 +14,13 @@ function App() {
   const onSubmit = async (e:React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     
-    try{
-      const res = await axios.get('150.241.82.68/api/chat/restricted')
-      console.log(res)
-      nav('/messanger')
-    } catch(err) {
-      console.error(err)
-    }
+    // try{
+    //   const res = await axios.get('150.241.82.68/api/chat/restricted')
+    //   console.log(res)
+    //   nav('/messanger')
+    // } catch(err) {
+    //   console.error(err)
+    // }
   }
 
   return (
