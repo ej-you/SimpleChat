@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { FieldValues } from 'react-hook-form'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { useErrorStore } from '../store/store'
 import Auth from '../components/auth/Auth'
 import { useEffect } from 'react'
@@ -26,7 +26,7 @@ const AuthApi:React.FC<IProps> = ({ apiUrl }) => {
       nav('/')
     } catch (err) {
       console.error(err)
-      setErrorContent((err as Error).message)
+      setErrorContent((err as AxiosError).message)
     }
   }
 
