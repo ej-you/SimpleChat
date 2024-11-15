@@ -2,11 +2,11 @@ import { useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import Error from './components/error/Error'
-import useFindUser from './api/FindUserApi'
+import useGetMessages from './api/useGetMessages'
 
 function App() {
   const nav = useNavigate()
-  const {findUserApi} = useFindUser()
+  const {getMessages} = useGetMessages()
 
   useEffect(() =>{
     if(!localStorage.getItem('registered')){
@@ -25,7 +25,7 @@ function App() {
 				<h2 className='text-subtitle-gray font-bold'>type user username</h2>
       </div>
 
-      <form action="" className='flex flex-col w-60 gap-3.5' onSubmit={handleSubmit(findUserApi)}>
+      <form action="" className='flex flex-col w-60 gap-3.5' onSubmit={handleSubmit(getMessages)}>
         <div className="relative">
           <input {...register('findUserByName', {required: true})} type="text" id="floating_outlined" className="block w-full text-subtitle-gray font-bold bg-transparent appearance-none py-2.5 px-4 rounded-xl border-2  border-subtitle-gray outline-none" autoComplete="off"/>
           <label htmlFor="floating_outlined" className="absolute text-sm text-subtitle-gray duration-300 transform -translate-y-4  top-2.5 z-10 origin-[0] bg-background-800 px-0.5 start-3">Username</label>

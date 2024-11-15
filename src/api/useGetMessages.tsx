@@ -2,13 +2,13 @@ import { useNavigate } from 'react-router-dom'
 import { useErrorStore, useUserNameStore } from '../store/store'
 import axios, { AxiosError } from 'axios'
 
-const useFindUser = () => {
+const useGetMessages = () => {
 	const nav = useNavigate();
   const setUserName = useUserNameStore(state => state.setUserName);
   const setErrorContent = useErrorStore(state => state.setErrorContent);
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const findUserApi = async (data: any) => {
+	const getMessages = async (data: any) => {
 		setErrorContent('')
     try{
       const res = await axios.get(`http://150.241.82.68/api/chat/get-messages/${data}`, {withCredentials: true,})
@@ -26,7 +26,7 @@ const useFindUser = () => {
     }
   }
 
-	return {findUserApi}
+	return {getMessages}
 }
 
-export default useFindUser
+export default useGetMessages
