@@ -1,9 +1,22 @@
 import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useChatStore } from '../../store/store'
+import Message from './message/message'
+
+interface IMessage {
+	content: string
+	createdAt: string
+	sender: object
+}
+
+interface IChat {
+	messages: IMessage[]
+}
 
 const Messanger = () => {
 	const nav = useNavigate()
-
+	const chat = useChatStore(state => state.chatData) as IChat
+	
 	useEffect(() =>{
     if(!localStorage.getItem('registered')){
       nav('/signin')
@@ -17,24 +30,16 @@ const Messanger = () => {
         <h1 className='text-title text-xl font-bold'>Username</h1>
     </header>
     <div className="main flex flex-col flex-grow py-10 gap-4 overflow-y-scroll">
-			<div className="flex items-center gap-4">
-				<div className='bg-background-400 max-w-screen-xl break-words flex-wrap py-3.5 px-4 rounded-r-xl rounded-t-xl'>
-					<p className='text-white text-base font-light'>Hello</p>
-				</div>
-				<p className='text-subtitle-gray text-sm'>20:17</p>
-			</div>
-			<div className="flex items-center gap-4">
-				<div className='bg-background-400 max-w-screen-xl break-words flex-wrap py-3.5 px-4 rounded-r-xl rounded-t-xl'>
-					<p className='text-white text-base font-light'>How are you</p>
-				</div>
-				<p className='text-subtitle-gray text-sm'>20:17</p>
-			</div>
-			<div className="flex items-center gap-4 flex-row-reverse">
+
+			{chat.messages.map((el: IMessage, index: number) => <Message key={index} el={el} />)}
+			
+			{/* <div className="flex items-center gap-4 flex-row-reverse">
 				<div className='bg-background-400 max-w-screen-xl break-words flex-wrap py-3.5 px-4 rounded-l-xl rounded-t-xl'>
 					<p className='text-primary text-base font-light'>Hello</p>
 				</div>
 				<p className='text-subtitle-gray text-sm'>20:17</p>
-			</div>
+			</div> */}
+
     </div>
     <footer className='flex flex-col gap-4 background-400'>
 			<hr className='w-full border-background-400'/>

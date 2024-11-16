@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import defaultChatData from '../test_data/testData'
 
 interface IErrors {
 	errorContent: string
@@ -18,4 +19,12 @@ interface IUserName {
 export const useUserNameStore = create<IUserName>(set => ({
 	userName: '',
 	setUserName: (newUserName) => set(() => ({ userName: newUserName }))
+}))
+
+interface IChat {
+	chatData: object
+}
+
+export const useChatStore = create<IChat>(() => ({
+	chatData: defaultChatData
 }))
