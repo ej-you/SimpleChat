@@ -14,7 +14,7 @@ const chatData = {
       "createdAt": "2024-11-13T12:34:56Z",
       "sender": {
         "id": "e2f53f31-0598-4e36-b25d-41bd665764d1",
-        "username": "vasya_2007"
+        "username": "wefwef"
       }
     },
   ],
@@ -25,7 +25,7 @@ const chatData = {
     },
     {
       "id": "e2f53f31-0598-4e36-b25d-41bd665764d1",
-      "username": "vasya_2007f"
+      "username": "wefwef"
     }
   ]
 }

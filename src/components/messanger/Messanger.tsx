@@ -1,14 +1,14 @@
 import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useChatStore } from '../../store/store'
-import Message from './message/message'
 import useGetMessages from '../../api/useGetMessages'
 import Error from '../error/Error'
+import Message from './message/Message'
 
 interface IMessage {
 	content: string
 	createdAt: string
-	sender: object
+	sender: {username: string}
 }
 
 interface IUsers {
