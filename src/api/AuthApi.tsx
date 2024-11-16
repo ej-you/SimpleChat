@@ -14,6 +14,7 @@ const AuthApi:React.FC<IProps> = ({ apiUrl }) => {
   const setErrorContent = useErrorStore(state => state.setErrorContent)
 
   useEffect(() => {
+    localStorage.removeItem('registered')
     setErrorContent('')
   }, [setErrorContent])
 
@@ -21,11 +22,11 @@ const AuthApi:React.FC<IProps> = ({ apiUrl }) => {
     setErrorContent('')
     try {
       const res = await axios.post(apiUrl, data)
-      localStorage.setItem('registered', 'true')
+      localStorage.setItem('registered', data.username)
       console.log(res)
       nav('/')
     } catch (err) {
-      console.error(err)
+      console.error(err)  
       setErrorContent((err as AxiosError).message)
     }
   }

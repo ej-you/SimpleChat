@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-import defaultChatData from '../test_data/testData'
 
 interface IErrors {
 	errorContent: string
@@ -11,20 +10,12 @@ export const useErrorStore = create<IErrors>(set => ({
 	setErrorContent: (newErrorContent) => set(() => ({ errorContent: newErrorContent }))
 }))
 
-interface IUserName {
-	userName: string
-	setUserName: (newUserName: string) => void
-}
-
-export const useUserNameStore = create<IUserName>(set => ({
-	userName: '',
-	setUserName: (newUserName) => set(() => ({ userName: newUserName }))
-}))
-
 interface IChat {
-	chatData: object
+	chatData: object | null
+	setChatData: (newChatData:object) => void 
 }
 
-export const useChatStore = create<IChat>(() => ({
-	chatData: defaultChatData
+export const useChatStore = create<IChat>(set => ({
+	chatData: null,
+	setChatData: (newChatData) => set(() => ({ chatData: newChatData}))
 }))

@@ -22,6 +22,10 @@ const chatData = {
     {
       "id": "e2f53f31-0598-4e36-b25d-41bd665764d1",
       "username": "vasya_2007"
+    },
+    {
+      "id": "e2f53f31-0598-4e36-b25d-41bd665764d1",
+      "username": "vasya_2007f"
     }
   ]
 }
