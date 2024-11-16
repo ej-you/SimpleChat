@@ -1,21 +1,21 @@
-import { useChatStore, useErrorStore } from '../store/store'
+import { useChatStore } from '../store/store'
 import chatData from '../test_data/testData'
 
 const useGetMessages = () => {
-  const setErrorContent = useErrorStore(state => state.setErrorContent);
+  // const setErrorContent = useErrorStore(state => state.setErrorContent);
   const setChatData = useChatStore(state => state.setChatData)
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const getMessages = async (data: any) => {
     setChatData(chatData)
     console.log(data)
-    setErrorContent('Ошибка, если запрос неуспешен. Если данных нет, они отображаться не будут.')
 
 		// setErrorContent('')
     // try{
     //   const res = await axios.get(`http://150.241.82.68/api/chat/get-messages/${data}`, {withCredentials: true,})
     //   console.log(res.data)
     //   setUserName(data.findUserByName)
+    //   setErrorContent('')
     //   nav('/messanger')
     // } catch(err) {
     //   console.error(err)

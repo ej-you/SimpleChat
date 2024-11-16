@@ -9,9 +9,9 @@ const Router = () => {
 		<BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true  }}>
 			<Routes>
 				<Route path='/' element={<App />}></Route>
+				<Route path='/messanger' element={<Messanger />}/>
 				<Route path='/signin' element={<SignIn />}/>
 				<Route path='/signup' element={<SignUp />}/>
-				<Route path='/messanger' element={<Messanger />}/>
 			</Routes>
 		</BrowserRouter>
 	)

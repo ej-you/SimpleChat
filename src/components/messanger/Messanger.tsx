@@ -23,19 +23,20 @@ interface IChat {
 
 const Messanger = () => {
 	const nav = useNavigate()
-	const {getMessages} = useGetMessages()
 
+	useEffect(() =>{
+		if(!localStorage.getItem('registered')){
+			nav('/signin')
+		}
+	},[nav])
+
+	const {getMessages} = useGetMessages()
 	getMessages('user3')
 
 	const registeredUser  = localStorage.getItem('registered')
 	const chat = useChatStore(state => state.chatData) as IChat
 	const companion = chat && chat.users.filter(el => el.username !== registeredUser)
 	
-	useEffect(() =>{
-		if(!localStorage.getItem('registered')){
-			nav('/signin')
-		}
-	},[nav])
 	
 	return (
 		<>
