@@ -5,10 +5,9 @@ const useGetMessages = () => {
   // const setErrorContent = useErrorStore(state => state.setErrorContent);
   const setChatData = useChatStore(state => state.setChatData)
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const getMessages = async (data: any) => {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
+	const getMessages = async (_data: any) => {
     setChatData(chatData)
-    console.log(data)
 
 		// setErrorContent('')
     // try{

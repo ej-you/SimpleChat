@@ -4,7 +4,7 @@ import useGetMessages from '../../api/useGetMessages'
 import { useChatStore } from '../../store/store'
 import Error from '../error/Error'
 import Message from './message/Message'
-import TextField from './TextField'
+import Footer from './footer/Footer'
 
 interface IMessage {
 	content: string
@@ -38,6 +38,7 @@ const Messanger = () => {
 	const chat = useChatStore(state => state.chatData) as IChat
 	const companion = chat && chat.users.filter(el => el.username !== registeredUser)
 
+
 	return (
 		<>
 			<Error />
@@ -58,15 +59,7 @@ const Messanger = () => {
 					}
 				</main>
 
-				<footer className='flex flex-col gap-4 background-400'>
-					<hr className='w-full border-background-400' />
-					<div className='flex gap-4'>
-						<TextField />
-						<div className='bg-primary rounded-xl flex justify-center px-3 h-fit aspect-[1/1]'>
-							<img className='w-6' src='../../../public/uil_message.svg' alt='' />
-						</div>
-					</div>
-				</footer>
+				<Footer />
 
 			</div>
 		</>
