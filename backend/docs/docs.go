@@ -78,6 +78,69 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/check/{username}": {
+            "get": {
+                "description": "Check user is exists by his username (returns error if checked current user)",
+                "consumes": [
+                    "text/plain"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Check user is exists",
+                "operationId": "user-check",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Check user is exists",
+                        "name": "username",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/serializers.CheckOut"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.UserCheck400"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/errors.UserCheck401"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.UserCheck404"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/errors.UserCheck409"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.General500"
+                        }
+                    }
+                }
+            }
+        },
         "/user/login": {
             "post": {
                 "description": "Login existing user by email and password",
@@ -316,6 +379,130 @@ const docTemplate = `{
                 }
             }
         },
+        "errors.UserCheck400": {
+            "description": "ошибка валидации входных данных",
+            "type": "object",
+            "properties": {
+                "errors": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "username": "username field must not be blank"
+                    }
+                },
+                "path": {
+                    "type": "string",
+                    "example": "/api/user/login"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "error"
+                },
+                "statusCode": {
+                    "type": "integer",
+                    "example": 400
+                },
+                "timestamp": {
+                    "type": "string",
+                    "example": "24-11-11 11:57:28 +03"
+                }
+            }
+        },
+        "errors.UserCheck401": {
+            "description": "ошибка отсутствия куков (истёк токен и соответственно куки авторизации вместе с ним)",
+            "type": "object",
+            "properties": {
+                "errors": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "token": "missing auth cookie"
+                    }
+                },
+                "path": {
+                    "type": "string",
+                    "example": "/api/chat/check"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "error"
+                },
+                "statusCode": {
+                    "type": "integer",
+                    "example": 401
+                },
+                "timestamp": {
+                    "type": "string",
+                    "example": "24-11-11 11:57:28 +03"
+                }
+            }
+        },
+        "errors.UserCheck404": {
+            "description": "ошибка ненахождения юзера с таким логином в БД",
+            "type": "object",
+            "properties": {
+                "errors": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "getUser": "user with such username was not found"
+                    }
+                },
+                "path": {
+                    "type": "string",
+                    "example": "/api/user/check"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "error"
+                },
+                "statusCode": {
+                    "type": "integer",
+                    "example": 404
+                },
+                "timestamp": {
+                    "type": "string",
+                    "example": "24-11-11 11:57:28 +03"
+                }
+            }
+        },
+        "errors.UserCheck409": {
+            "description": "ошибка проверки текущего юзера",
+            "type": "object",
+            "properties": {
+                "errors": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "check": "current user was checked"
+                    }
+                },
+                "path": {
+                    "type": "string",
+                    "example": "/api/user/check"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "error"
+                },
+                "statusCode": {
+                    "type": "integer",
+                    "example": 409
+                },
+                "timestamp": {
+                    "type": "string",
+                    "example": "24-11-11 11:57:28 +03"
+                }
+            }
+        },
         "errors.UserLogin400": {
             "description": "ошибка валидации входных данных",
             "type": "object",
@@ -531,6 +718,17 @@ const docTemplate = `{
                     "description": "логин юзера",
                     "type": "string",
                     "example": "vasya_2007"
+                }
+            }
+        },
+        "serializers.CheckOut": {
+            "description": "выходные данные для проверки юзера на существование",
+            "type": "object",
+            "properties": {
+                "isExists": {
+                    "description": "подтверждение существования такого юзера",
+                    "type": "boolean",
+                    "example": true
                 }
             }
         },

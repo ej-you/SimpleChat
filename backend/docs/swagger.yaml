@@ -91,6 +91,95 @@ definitions:
         example: 24-11-11 11:57:28 +03
         type: string
     type: object
+  errors.UserCheck400:
+    description: ошибка валидации входных данных
+    properties:
+      errors:
+        additionalProperties:
+          type: string
+        example:
+          username: username field must not be blank
+        type: object
+      path:
+        example: /api/user/login
+        type: string
+      status:
+        example: error
+        type: string
+      statusCode:
+        example: 400
+        type: integer
+      timestamp:
+        example: 24-11-11 11:57:28 +03
+        type: string
+    type: object
+  errors.UserCheck401:
+    description: ошибка отсутствия куков (истёк токен и соответственно куки авторизации
+      вместе с ним)
+    properties:
+      errors:
+        additionalProperties:
+          type: string
+        example:
+          token: missing auth cookie
+        type: object
+      path:
+        example: /api/chat/check
+        type: string
+      status:
+        example: error
+        type: string
+      statusCode:
+        example: 401
+        type: integer
+      timestamp:
+        example: 24-11-11 11:57:28 +03
+        type: string
+    type: object
+  errors.UserCheck404:
+    description: ошибка ненахождения юзера с таким логином в БД
+    properties:
+      errors:
+        additionalProperties:
+          type: string
+        example:
+          getUser: user with such username was not found
+        type: object
+      path:
+        example: /api/user/check
+        type: string
+      status:
+        example: error
+        type: string
+      statusCode:
+        example: 404
+        type: integer
+      timestamp:
+        example: 24-11-11 11:57:28 +03
+        type: string
+    type: object
+  errors.UserCheck409:
+    description: ошибка проверки текущего юзера
+    properties:
+      errors:
+        additionalProperties:
+          type: string
+        example:
+          check: current user was checked
+        type: object
+      path:
+        example: /api/user/check
+        type: string
+      status:
+        example: error
+        type: string
+      statusCode:
+        example: 409
+        type: integer
+      timestamp:
+        example: 24-11-11 11:57:28 +03
+        type: string
+    type: object
   errors.UserLogin400:
     description: ошибка валидации входных данных
     properties:
@@ -245,6 +334,14 @@ definitions:
         example: vasya_2007
         type: string
     type: object
+  serializers.CheckOut:
+    description: выходные данные для проверки юзера на существование
+    properties:
+      isExists:
+        description: подтверждение существования такого юзера
+        example: true
+        type: boolean
+    type: object
   serializers.LoginUserIn:
     description: входные данные для входа юзера
     properties:
@@ -318,6 +415,49 @@ paths:
       summary: Get chat messages
       tags:
       - chat
+  /user/check/{username}:
+    get:
+      consumes:
+      - text/plain
+      description: Check user is exists by his username (returns error if checked
+        current user)
+      operationId: user-check
+      parameters:
+      - description: Check user is exists
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/serializers.CheckOut'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.UserCheck400'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/errors.UserCheck401'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.UserCheck404'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/errors.UserCheck409'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.General500'
+      summary: Check user is exists
+      tags:
+      - user
   /user/login:
     post:
       consumes:

@@ -72,6 +72,46 @@ type UserLogin404 struct {
 	Timestamp	time.Time `json:"" example:"24-11-11 11:57:28 +03"`
 }
 
+// ---------------
+// /api/user/check
+// ---------------
+
+// @Description ошибка валидации входных данных
+type UserCheck400 struct {
+	Errors 		map[string]string `json:"" example:"username:username field must not be blank"`
+	Path 		string `json:"" example:"/api/user/login"`
+	Status 		string `json:"" example:"error"`
+	StatusCode 	int `json:"" example:"400"`
+	Timestamp	time.Time `json:"" example:"24-11-11 11:57:28 +03"`
+}
+
+// @Description ошибка отсутствия куков (истёк токен и соответственно куки авторизации вместе с ним)
+type UserCheck401 struct {
+	Errors 		map[string]string `json:"" example:"token:missing auth cookie"`
+	Path 		string `json:"" example:"/api/chat/check"`
+	Status 		string `json:"" example:"error"`
+	StatusCode 	int `json:"" example:"401"`
+	Timestamp	time.Time `json:"" example:"24-11-11 11:57:28 +03"`
+}
+
+// @Description ошибка ненахождения юзера с таким логином в БД
+type UserCheck404 struct {
+	Errors 		map[string]string `json:"" example:"getUser:user with such username was not found"`
+	Path 		string `json:"" example:"/api/user/check"`
+	Status 		string `json:"" example:"error"`
+	StatusCode 	int `json:"" example:"404"`
+	Timestamp	time.Time `json:"" example:"24-11-11 11:57:28 +03"`
+}
+
+// @Description ошибка проверки текущего юзера
+type UserCheck409 struct {
+	Errors 		map[string]string `json:"" example:"check:current user was checked"`
+	Path 		string `json:"" example:"/api/user/check"`
+	Status 		string `json:"" example:"error"`
+	StatusCode 	int `json:"" example:"409"`
+	Timestamp	time.Time `json:"" example:"24-11-11 11:57:28 +03"`
+}
+
 // ----------------------
 // /api/chat/get-messages
 // ----------------------
