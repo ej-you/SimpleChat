@@ -10,7 +10,7 @@ const useFindUser = () => {
 	const findUser = async (data: FieldValues) => {
 		setErrorContent('')
 		try {
-			await axios.get(`150.241.82.68/api/user/check/${data.findUserByName}`)
+			await axios.get(`https://150.241.82.68/api/user/check/${data.findUserByName}`)
 			nav('/messanger')
 		} catch(err) {
 			setErrorContent((err as AxiosError).message)

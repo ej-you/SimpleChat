@@ -11,7 +11,7 @@ const useGetMessages = () => {
 	const getMessages = async (nickname: string) => {
 		setErrorContent('')
     try{
-      const res = await axios.get(`http://150.241.82.68/api/chat/get-messages/${nickname}`, {withCredentials: true,})
+      const res = await axios.get(`https://150.241.82.68/api/chat/get-messages/${nickname}`, {withCredentials: true,})
       setChatData(res.data)
     } catch(err) {
       // если истек токен
