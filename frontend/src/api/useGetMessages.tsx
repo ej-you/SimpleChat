@@ -1,29 +1,13 @@
 import { useChatStore, useErrorStore } from '../store/store'
-import { useNavigate } from 'react-router-dom'
-import axios, { AxiosError } from 'axios'
+import chatData from '../test_data/testData'
 
 const useGetMessages = () => {
-  const nav = useNavigate()
   const setErrorContent = useErrorStore(state => state.setErrorContent)
   const setChatData = useChatStore(state => state.setChatData)
 
-	const getMessages = async (nickname: string) => {
+	const getMessages = async () => {
 		setErrorContent('')
-    try{
-      const res = await axios.get(`http://150.241.82.68/api/chat/get-messages/${nickname}`, {withCredentials: true,})
-      setChatData(res.data)
-      nav('/messanger')
-    } catch(err) {
-      // если истек токен
-      if((err as AxiosError).status === 401){
-        localStorage.removeItem('registered')
-        nav('/signup')
-        setErrorContent((err as AxiosError).message)
-      } else{
-        console.error(err)
-        setErrorContent((err as AxiosError).message)
-      }
-    }
+    setChatData(chatData)
   }
 
 	return {getMessages}
