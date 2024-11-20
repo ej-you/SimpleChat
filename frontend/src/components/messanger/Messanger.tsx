@@ -5,22 +5,7 @@ import { useChatStore } from '../../store/store'
 import Error from '../error/Error'
 import Message from './message/Message'
 import Footer from './footer/Footer'
-
-interface IMessage {
-	content: string
-	createdAt: string
-	sender: { username: string }
-}
-
-interface IUsers {
-	id: string
-	username: string
-}
-
-interface IChat {
-	messages: IMessage[]
-	users: IUsers[]
-}
+import { IChat, IMessage } from '../../types/messanger/types.messanger'
 
 const Messanger = () => {
 	const nav = useNavigate()

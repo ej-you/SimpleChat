@@ -1,12 +1,9 @@
 import { Link } from 'react-router-dom'
-import { FieldValues, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import Error from '../error/Error'
+import { IAuthProps } from '../../types/props/types.props'
 
-interface IProps {
-  onSubmit: (data: FieldValues) => void
-}
-
-const Auth: React.FC<IProps> = ({onSubmit}) => {
+const Auth: React.FC<IAuthProps> = ({onSubmit}) => {
   const {register, handleSubmit, formState: { errors }} = useForm()
 
 	return (
