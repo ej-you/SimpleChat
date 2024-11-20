@@ -12,20 +12,20 @@ export const useErrorStore = create<IErrors>(set => ({
 
 interface IMessage {
 	content: string
-	createdAt?: string
-	sender?: { id?: string; username?: string }
+	createdAt: string
+	sender: { id?: string; username: string }
 }
 
 interface IChatData {
-	messages: IMessage[];
-	id?: string;
-	users?: object[];
+	id?: string
+	messages: IMessage[]
+	users?: object[]
 }
 
 interface IChatStore {
-	chatData: IChatData | null;
-	setChatData: (newChatData: IChatData) => void;
-	addMessage: (newMessage: IMessage) => void;
+	chatData: IChatData | null
+	setChatData: (newChatData: IChatData) => void
+	addMessage: (newMessage: IMessage) => void
 }
 
 export const useChatStore = create<IChatStore>(set => ({
@@ -38,22 +38,19 @@ export const useChatStore = create<IChatStore>(set => ({
 				...state.chatData.messages,
 				{
 					content: newMessage.content,
-					createdAt: new Date().toISOString(),
-					sender: { 
-						username: localStorage.getItem('registered') || ''
-					}
+					createdAt: newMessage.createdAt,
+					sender: newMessage.sender 
 				}
 			]
 		} 
 		: {
 			messages: [
 				{
-				content: newMessage.content,
-				createdAt: new Date().toISOString(),
-				sender: { 
-					username: localStorage.getItem('registered') || ''
+					content: newMessage.content,
+					createdAt: newMessage.createdAt,
+					sender: newMessage.sender
 				}
-			}],
+			]
 		}
 	}))
-}));
+}))
