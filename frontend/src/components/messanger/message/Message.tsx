@@ -1,0 +1,20 @@
+import React from 'react'
+
+interface IProps {
+	el: {content: string, createdAt: string, sender: {username: string} }
+}
+
+const Message:React.FC<IProps> = ({el}) => {
+	return (
+		<>
+		<div className={`flex items-center gap-4 ${el.sender.username === localStorage.getItem('registered') && 'flex-row-reverse'}`}>
+			<div className={`bg-background-400 max-w-screen-xl break-words flex-wrap py-3.5 px-4 ${el.sender.username === localStorage.getItem('registered') ? 'rounded-l-xl' : 'rounded-r-xl'} rounded-t-xl`}>
+				<p className={`${el.sender.username === localStorage.getItem('registered') ? 'text-primary' : 'text-white'} text-base font-light`}>{el.content}</p>
+			</div>
+			<p className='text-subtitle-gray text-sm'>{el.createdAt}</p>
+		</div>
+		</>
+	)
+}
+
+export default Message

@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body, html {
+  font-family: "Montserrat", sans-serif;
+}
+
+.main::-webkit-scrollbar, textarea::-webkit-scrollbar{
+  display: none;
+}
+
+.box {
+  animation: 0.5s show ease;
+}
+
+@keyframes show {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.box.hide {
+  animation: 0.5s hide ease-in-out forwards
+} 
+
+@keyframes hide {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
