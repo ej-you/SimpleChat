@@ -9,22 +9,22 @@ import { IChat, IMessage } from '../../types/messanger/types.messanger'
 
 const Messanger = () => {
 	const nav = useNavigate()
+	const nickname = localStorage.getItem('registered') as string
 
 	useEffect(() => {
-		if (!localStorage.getItem('registered')) {
+		if (!nickname) {
 			nav('/signin')
 		}
-	}, [nav])
+	}, [nav, nickname])
 
 	const { getMessages } = useGetMessages()
 	useEffect(() => {
-		getMessages('username1')
+		getMessages(nickname)
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
-	const registeredUser = localStorage.getItem('registered')
 	const chat = useChatStore(state => state.chatData) as IChat
-	const companion = chat && chat.users.filter(el => el.username !== registeredUser)
+	const companion = chat && chat.users.filter(el => el.username !== nickname)
 
 	return (
 		<>
