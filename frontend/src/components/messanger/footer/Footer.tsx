@@ -6,6 +6,7 @@ const Footer = () => {
 	const nickname = localStorage.getItem('registered') as string
 	const addMessage = useChatStore(state => state.addMessage)
 	const [value, setValue] = useState('')
+	const [submitState, setSubmitState] = useState(true)
 	const textareaElement = useRef<HTMLTextAreaElement>(null)
 	const { handleSubmit, register, setValue: setFormValue, reset } = useForm<{ content: string }>({
 		defaultValues: {
@@ -19,7 +20,8 @@ const Footer = () => {
 		addMessage( { content: data.content, sender: {username: nickname}, createdAt: new Date().toISOString() } )
 		reset()
 		e?.target.reset()
-	}, [addMessage, nickname, reset])
+		setSubmitState(!submitState)
+	}, [addMessage, nickname, reset, submitState])
 
 	// Сохранение значений поля
 	const handleChange = (e: React.FormEvent<HTMLTextAreaElement>) => {
@@ -41,7 +43,8 @@ const Footer = () => {
 			textareaElement.current.style.height = 'auto'
 			textareaElement.current.style.height = `${textareaElement.current.scrollHeight}px`
 		}
-	}, [value, onSubmit])
+		console.log('first')
+	}, [value, submitState])
 	
 	return (
 		<footer className='flex flex-col gap-4 background-400'>
