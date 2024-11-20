@@ -32,12 +32,14 @@ const Messanger = () => {
 	}, [nav])
 
 	const { getMessages } = useGetMessages()
-	getMessages('user3')
+	useEffect(() => {
+		getMessages('username1')
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
 
 	const registeredUser = localStorage.getItem('registered')
 	const chat = useChatStore(state => state.chatData) as IChat
 	const companion = chat && chat.users.filter(el => el.username !== registeredUser)
-
 
 	return (
 		<>

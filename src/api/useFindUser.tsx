@@ -1,16 +1,16 @@
 import { useNavigate } from 'react-router-dom'
-// import { useErrorStore } from '../store/store'
+import { useErrorStore } from '../store/store'
+// import axios, { AxiosError } from 'axios'
 
 const useFindUser = () => {
 	const nav = useNavigate()
-	// const setErrorContent = useErrorStore(store => store.setErrorContent)
+	const setErrorContent = useErrorStore(store => store.setErrorContent)
 
 	const findUser = async () => {
+		setErrorContent('')
 		nav('/messanger')
-		
-		// setErrorContent('')
 		// try {
-		// 	await axios.post('', 'username')
+		// 	await axios.get('')
 		// 	nav('/messanger')
 		// } catch(err) {
 		// 	setErrorContent((err as AxiosError).message)

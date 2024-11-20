@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { useChatStore } from '../../../store/store'
 
 const Footer = () => {
+	const addMessage = useChatStore(state => state.addMessage)
 	const [value, setValue] = useState('')
 	const textareaElement = useRef<HTMLTextAreaElement>(null)
 	const { handleSubmit, register, setValue: setFormValue, reset } = useForm<{ content: string }>({
@@ -12,10 +14,10 @@ const Footer = () => {
 
 	// Очистка поля, получение данных
 	const onSubmit: SubmitHandler<{ content: string }> = useCallback((data, e) => {
-		console.log(data)
+		addMessage(data)
 		reset()
 		e?.target.reset()
-	}, [reset])
+	}, [addMessage, reset])
 
 	// Сохранение значений поля
 	const handleChange = (e: React.FormEvent<HTMLTextAreaElement>) => {
