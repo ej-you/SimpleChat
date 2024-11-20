@@ -1,10 +1,7 @@
 import React from 'react'
+import { IMessageProps } from '../../../types/props/types.props'
 
-interface IProps {
-	el: {content: string, createdAt: string, sender: {username: string} }
-}
-
-const Message:React.FC<IProps> = ({el}) => {
+const Message:React.FC<IMessageProps> = ({el}) => {
 	return (
 		<>
 		<div className={`flex items-center gap-4 ${el.sender.username === localStorage.getItem('registered') && 'flex-row-reverse'}`}>

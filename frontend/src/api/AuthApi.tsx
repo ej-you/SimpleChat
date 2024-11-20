@@ -4,12 +4,9 @@ import axios, { AxiosError } from 'axios'
 import { useErrorStore } from '../store/store'
 import Auth from '../components/auth/Auth'
 import { useEffect } from 'react'
+import { IAuthApiProps } from '../types/props/types.props'
 
-interface IProps {
-	apiUrl: string
-}
-
-const AuthApi:React.FC<IProps> = ({ apiUrl }) => {
+const AuthApi:React.FC<IAuthApiProps> = ({ apiUrl }) => {
   const nav = useNavigate()
   const setErrorContent = useErrorStore(state => state.setErrorContent)
 
