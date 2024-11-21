@@ -1,10 +1,15 @@
 import { create } from 'zustand';
-import { IChatStore, IErrors } from '../types/store/types.store'
+import { IChatStore, ICompanion, IErrors } from '../types/store/types.store'
 
 export const useErrorStore = create<IErrors>(set => ({
     errorContent: '',
     setErrorContent: (newErrorContent) => set(() => ({ errorContent: newErrorContent })),
 }));
+
+export const useCompanionStore = create<ICompanion>(set => ({
+	companion: '',
+	setCompanion: (newCompanion) => set(() => ({ companion: newCompanion }))
+}))
 
 export const useChatStore = create<IChatStore>(set => ({
 	chatData: null,

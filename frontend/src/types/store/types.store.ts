@@ -4,6 +4,12 @@ export interface IErrors {
 	setErrorContent: (newErrorContent: string) => void;
 }
 
+// UseCompanionStore
+export interface ICompanion {
+	companion: string
+	setCompanion: (newCompanion: string) => void
+}
+
 // useChatStore
 interface IMessage {
 	content: string
