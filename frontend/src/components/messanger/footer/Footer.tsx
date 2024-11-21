@@ -6,7 +6,9 @@ const Footer = () => {
 	const nickname = localStorage.getItem('registered') as string
 	const addMessage = useChatStore(state => state.addMessage)
 	const [value, setValue] = useState('')
+	const [submitState, setSubmitState] = useState(true)
 	const textareaElement = useRef<HTMLTextAreaElement>(null)
+	const formElement = useRef<HTMLFormElement>(null)
 	const { handleSubmit, register, setValue: setFormValue, reset } = useForm<{ content: string }>({
 		defaultValues: {
 			content: ''
@@ -14,24 +16,33 @@ const Footer = () => {
 	})
 
 	// Очистка поля, получение данных
-	const onSubmit: SubmitHandler<{ content: string }> = useCallback((data, e) => {
-		console.log({ content: data.content, sender: {username: nickname}, createdAt: new Date().toISOString() })
+	const onSubmit: SubmitHandler<{ content: string }> = useCallback((data) => {
 		addMessage( { content: data.content, sender: {username: nickname}, createdAt: new Date().toISOString() } )
 		reset()
-		e?.target.reset()
-	}, [addMessage, nickname, reset])
+		console.log(data)
+		formElement.current?.reset()
+		setSubmitState(!submitState)
+		setValue('')
+	}, [addMessage, nickname, reset, submitState])
 
 	// Сохранение значений поля
 	const handleChange = (e: React.FormEvent<HTMLTextAreaElement>) => {
-		const newValue = (e.target as HTMLTextAreaElement).value;
-		setValue(newValue);
-		setFormValue('content', newValue);
+		const newValue = (e.target as HTMLTextAreaElement).value
+		setValue(newValue)
+		setFormValue('content', newValue)
 	}
 
-	// Ctrl + shift - перенос строки
-	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-		if (e.key === 'Enter' && !e.shiftKey) {
-			e.preventDefault()
+	// Ctrl + shift - перенос строки, enter - отправка
+	const handleKeyDown = (e: React.KeyboardEvent) => {
+		if (value.trim() === '') {
+			if (e.key === 'Enter') {
+				e.preventDefault()
+			}
+		} else {
+			if (e.key === 'Enter' && !e.shiftKey) {
+				e.preventDefault()
+				handleSubmit(onSubmit)()
+			}
 		}
 	}
 
@@ -41,14 +52,14 @@ const Footer = () => {
 			textareaElement.current.style.height = 'auto'
 			textareaElement.current.style.height = `${textareaElement.current.scrollHeight}px`
 		}
-	}, [value, onSubmit])
+	}, [value, submitState])
 	
 	return (
 		<footer className='flex flex-col gap-4 background-400'>
 			<hr className='w-full border-background-400' />
-			<form className='flex gap-4' onSubmit={handleSubmit(onSubmit)}>
-				<textarea
-					{...register('content')}
+			<form className='flex gap-4' ref={formElement} onSubmit={handleSubmit(onSubmit)}>
+				<textarea 
+					{...register('content', {required: true})}
 					ref={textareaElement}
 					tabIndex={0}
 					rows={1}
@@ -62,7 +73,7 @@ const Footer = () => {
 				
 					placeholder='Type here...'
 					onChange={handleChange}
-					onKeyDown={handleKeyDown}
+					onKeyDown={handleKeyDown} 
 					onInput={(e) => {
 						const target = e.target as HTMLTextAreaElement
 						target.style.height = `${target.scrollHeight}px`
