@@ -19,22 +19,30 @@ const Footer = () => {
 	const onSubmit: SubmitHandler<{ content: string }> = useCallback((data) => {
 		addMessage( { content: data.content, sender: {username: nickname}, createdAt: new Date().toISOString() } )
 		reset()
+		console.log(data)
 		formElement.current?.reset()
 		setSubmitState(!submitState)
+		setValue('')
 	}, [addMessage, nickname, reset, submitState])
 
 	// Сохранение значений поля
 	const handleChange = (e: React.FormEvent<HTMLTextAreaElement>) => {
-		const newValue = (e.target as HTMLTextAreaElement).value;
-		setValue(newValue);
-		setFormValue('content', newValue);
+		const newValue = (e.target as HTMLTextAreaElement).value
+		setValue(newValue)
+		setFormValue('content', newValue)
 	}
 
 	// Ctrl + shift - перенос строки, enter - отправка
 	const handleKeyDown = (e: React.KeyboardEvent) => {
-		if (e.key === 'Enter' && !e.shiftKey) {
-			e.preventDefault()
-			handleSubmit(onSubmit)()
+		if (value.trim() === '') {
+			if (e.key === 'Enter') {
+				e.preventDefault()
+			}
+		} else {
+			if (e.key === 'Enter' && !e.shiftKey) {
+				e.preventDefault()
+				handleSubmit(onSubmit)()
+			}
 		}
 	}
 
