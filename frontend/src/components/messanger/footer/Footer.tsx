@@ -17,7 +17,6 @@ const Footer = () => {
 
 	// Очистка поля, получение данных
 	const onSubmit: SubmitHandler<{ content: string }> = useCallback((data) => {
-		// console.log({ content: data.content, sender: {username: nickname}, createdAt: new Date().toISOString() })
 		addMessage( { content: data.content, sender: {username: nickname}, createdAt: new Date().toISOString() } )
 		reset()
 		formElement.current?.reset()

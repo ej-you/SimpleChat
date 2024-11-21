@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import useGetMessages from '../../api/useGetMessages'
 import { useChatStore } from '../../store/store'
@@ -10,6 +10,7 @@ import { IChat, IMessage } from '../../types/messanger/types.messanger'
 const Messanger = () => {
 	const nav = useNavigate()
 	const nickname = localStorage.getItem('registered') as string
+	const chatRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
 		if (!nickname) {
@@ -26,6 +27,13 @@ const Messanger = () => {
 	const chat = useChatStore(state => state.chatData) as IChat
 	const companion = chat && chat.users.filter(el => el.username !== nickname)
 
+	// Скролл чата
+	useEffect(() => {
+		if (chatRef.current) {
+			chatRef.current.scrollTop = chatRef.current.scrollHeight;
+    }
+	}, [chat])
+
 	return (
 		<>
 			<Error />
@@ -40,7 +48,7 @@ const Messanger = () => {
 					)}
 				</header>
 
-				<main className='main flex flex-col flex-grow py-10 gap-4 overflow-y-scroll'>
+				<main ref={chatRef} className='main flex flex-col flex-grow py-10 gap-4 overflow-y-scroll'>
 					{chat &&
 					chat.messages.map((el: IMessage, index: number) => (<Message key={index} el={el} />))
 					}
