@@ -8,6 +8,7 @@ const Footer = () => {
 	const [value, setValue] = useState('')
 	const [submitState, setSubmitState] = useState(true)
 	const textareaElement = useRef<HTMLTextAreaElement>(null)
+	const formElement = useRef<HTMLFormElement>(null)
 	const { handleSubmit, register, setValue: setFormValue, reset } = useForm<{ content: string }>({
 		defaultValues: {
 			content: ''
@@ -15,11 +16,11 @@ const Footer = () => {
 	})
 
 	// Очистка поля, получение данных
-	const onSubmit: SubmitHandler<{ content: string }> = useCallback((data, e) => {
-		console.log({ content: data.content, sender: {username: nickname}, createdAt: new Date().toISOString() })
+	const onSubmit: SubmitHandler<{ content: string }> = useCallback((data) => {
+		// console.log({ content: data.content, sender: {username: nickname}, createdAt: new Date().toISOString() })
 		addMessage( { content: data.content, sender: {username: nickname}, createdAt: new Date().toISOString() } )
 		reset()
-		e?.target.reset()
+		formElement.current?.reset()
 		setSubmitState(!submitState)
 	}, [addMessage, nickname, reset, submitState])
 
@@ -30,10 +31,11 @@ const Footer = () => {
 		setFormValue('content', newValue);
 	}
 
-	// Ctrl + shift - перенос строки
-	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+	// Ctrl + shift - перенос строки, enter - отправка
+	const handleKeyDown = (e: React.KeyboardEvent) => {
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault()
+			handleSubmit(onSubmit)()
 		}
 	}
 
@@ -43,15 +45,14 @@ const Footer = () => {
 			textareaElement.current.style.height = 'auto'
 			textareaElement.current.style.height = `${textareaElement.current.scrollHeight}px`
 		}
-		console.log('first')
 	}, [value, submitState])
 	
 	return (
 		<footer className='flex flex-col gap-4 background-400'>
 			<hr className='w-full border-background-400' />
-			<form className='flex gap-4' onSubmit={handleSubmit(onSubmit)}>
-				<textarea
-					{...register('content')}
+			<form className='flex gap-4' ref={formElement} onSubmit={handleSubmit(onSubmit)}>
+				<textarea 
+					{...register('content', {required: true})}
 					ref={textareaElement}
 					tabIndex={0}
 					rows={1}
@@ -65,7 +66,7 @@ const Footer = () => {
 				
 					placeholder='Type here...'
 					onChange={handleChange}
-					onKeyDown={handleKeyDown}
+					onKeyDown={handleKeyDown} 
 					onInput={(e) => {
 						const target = e.target as HTMLTextAreaElement
 						target.style.height = `${target.scrollHeight}px`
