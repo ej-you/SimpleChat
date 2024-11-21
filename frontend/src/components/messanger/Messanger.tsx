@@ -19,7 +19,7 @@ const Messanger = () => {
 
 	const { getMessages } = useGetMessages()
 	useEffect(() => {
-		getMessages(nickname)
+		getMessages()
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
