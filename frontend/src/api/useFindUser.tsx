@@ -13,13 +13,15 @@ const useFindUser = () => {
 		try {
 			await axios.get(`https://150.241.82.68/api/user/check/${data.findUserByName}`, {withCredentials: true,})
 			setCompanion(data.findUserByName)
-			nav('/messanger')
+			nav('/messanger/1')
 		} catch(err) {
 			// если истек токен
       if((err as AxiosError).status === 401){
-        localStorage.removeItem('registered')
-        nav('/signup')
         setErrorContent((err as AxiosError).message)
+				setTimeout(() => {
+					localStorage.removeItem('registered')
+					nav('/signup')
+				}, 1000);
       } else{
         console.error(err)
         setErrorContent((err as AxiosError).message)

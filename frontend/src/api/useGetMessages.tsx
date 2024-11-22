@@ -17,9 +17,11 @@ const useGetMessages = () => {
     } catch(err) {
       // если истек токен
       if((err as AxiosError).status === 401){
-        localStorage.removeItem('registered')
-        nav('/signup')
         setErrorContent((err as AxiosError).message)
+        setTimeout(() => {
+					localStorage.removeItem('registered')
+					nav('/signup')
+				}, 1000);
       } else{
         console.error(err)
         setErrorContent((err as AxiosError).message)
