@@ -41,6 +41,8 @@ func GetAuthCookie(userID uuid.UUID) (*http.Cookie, error) {
 		Value: token,
 		Path: "/api/",
 		HttpOnly: true,
+		Secure: settings.CookieSecure,
+		SameSite: http.SameSiteNoneMode,
 		Expires: time.Now().Add(settings.TokenExpiredTime),
 	}
 

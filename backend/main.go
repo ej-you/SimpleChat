@@ -63,7 +63,8 @@ func main() {
 	echoApp.Use(echoMiddleware.CORSWithConfig(echoMiddleware.CORSConfig{
 		AllowOrigins: settings.CorsAllowedOrigins,
 		AllowMethods: settings.CorsAllowedMethods,
-		AllowCredentials: settings.CorsAllowCredentials,
+		AllowHeaders: []string{"Content-Type", "Authorization"},
+		AllowCredentials: true,
 	}))
 
 	// настройка таймаута для всех запросов на 20 секунд

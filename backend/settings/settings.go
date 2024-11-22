@@ -1,6 +1,7 @@
 package settings
 
 import (
+	"net/http"
 	"log"
 	"os"
 	"strings"
@@ -18,9 +19,31 @@ var _ error = godotenv.Load("./.env")
 var Port string = os.Getenv("GO_PORT")
 var SecretForJWT string = os.Getenv("SECRET")
 
+// настройки CORS
 var CorsAllowedOrigins []string = strings.Split(os.Getenv("CORS_ALLOWED_ORIGINS"), ",")
 var CorsAllowedMethods []string = strings.Split(os.Getenv("CORS_ALLOWED_METHODS"), ",")
-var CorsAllowCredentials bool = true
+// параметры для настройки куки авторизации
+var CookieSecure bool = func() bool {
+	cookieSecureValue := os.Getenv("COOKIES_SECURE")
+	if cookieSecureValue == "true" {
+		return true
+	}
+	return false
+}()
+var CookieSameSite http.SameSite = func() http.SameSite {
+	sameSiteValue := os.Getenv("COOKIES_SAME_SITE")
+
+	switch sameSiteValue {
+		case "LaxMode":
+			return http.SameSiteLaxMode
+		case "StrictMode":
+			return http.SameSiteStrictMode
+		case "NoneMode":
+			return http.SameSiteNoneMode
+		default:
+			return http.SameSiteDefaultMode
+	}
+}()
 
 // время истечения действия токена
 var TokenExpiredTime time.Duration = time.Minute * 1
