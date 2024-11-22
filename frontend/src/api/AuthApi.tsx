@@ -25,9 +25,9 @@ const AuthApi:React.FC<IAuthApiProps> = ({ apiUrl }) => {
     } catch (err) {
       // если истек токен
       if((err as AxiosError).status === 401) {
+        setErrorContent((err as AxiosError).message)
         localStorage.removeItem('registered')
         nav('/signup')
-        setErrorContent((err as AxiosError).message)
       } else{
         console.error(err)
         setErrorContent((err as AxiosError).message)
