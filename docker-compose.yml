@@ -22,8 +22,11 @@ services:
       dockerfile: ./web_server/Dockerfile
     container_name: simple_chat_nginx
     restart: always
+    volumes:
+      - /etc/ssl/my_certs:/etc/nginx/ssl/:ro
     ports:
       - "80:80"
+      - "443:443"
     networks:
       proj_network:
         ipv4_address: 172.16.1.6
