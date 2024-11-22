@@ -19,7 +19,7 @@ const AuthApi:React.FC<IAuthApiProps> = ({ apiUrl }) => {
   const onSubmit = async (data: FieldValues) => {
     setErrorContent('')
     try {
-      await axios.post(apiUrl, data)
+      await axios.post(apiUrl, data, {withCredentials: true,})
       localStorage.setItem('registered', data.username)
       nav('/')
     } catch (err) {
