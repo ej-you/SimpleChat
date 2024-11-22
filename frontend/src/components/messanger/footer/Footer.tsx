@@ -19,7 +19,6 @@ const Footer = () => {
 	const onSubmit: SubmitHandler<{ content: string }> = useCallback((data) => {
 		addMessage( { content: data.content, sender: {username: nickname}, createdAt: new Date().toISOString() } )
 		reset()
-		console.log(data)
 		formElement.current?.reset()
 		setSubmitState(!submitState)
 		setValue('')
@@ -72,11 +71,11 @@ const Footer = () => {
 					className='w-full h-fit resize-none text-white placeholder:text-subtitle-gray font-bold bg-background-400 appearance-none py-3 px-4 rounded-xl border-subtitle-gray outline-none'
 				
 					placeholder='Type here...'
-					onChange={handleChange}
 					onKeyDown={handleKeyDown} 
 					onInput={(e) => {
 						const target = e.target as HTMLTextAreaElement
 						target.style.height = `${target.scrollHeight}px`
+						handleChange(e)
 					}}>
 				</textarea>
 
