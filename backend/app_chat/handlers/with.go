@@ -12,23 +12,23 @@ import (
 )
 
 
-// эндпоинт для получения чата для двух юзеров и сообщений из этого чата
-//	@Summary		Get chat messages
-//	@Description	Get chat messages (also chat uuid && chat participants) by username of another chat participant in path parameters
-//	@Router			/chat/get-messages/{username} [get]
-//	@ID				chat-get-messages
+// эндпоинт для получения id чата для двух юзеров
+//	@Summary		Get chat id
+//	@Description	Get chat id by username of another chat participant in path parameters
+//	@Router			/chat/with/{username} [get]
+//	@ID				chat-with
 //	@Tags			chat
 //	@Accept			plain
 //	@Produce		json
-//	@Param			username	path		string	true	"Get messages params"
-//	@Success		200			{object}	models.Chat
-//	@Failure		400			{object}	errors.ChatGetMessages400
-//	@Failure		401			{object}	errors.ChatGetMessages401
-//	@Failure		404			{object}	errors.ChatGetMessages404
-//	@Failure		500			{object}	errors.General500
-func GetMessages(context echo.Context) error {
+//	@Param			username	path		string	true	"Chat participant username"
+//	@Success		200			{object}	serializers.WithOut
+//	@Failure		400			{object}	errors.ChatWithSameUser400
+//	@Failure		401			{object}	errors.GeneralExpiredCredentials401
+//	@Failure		404			{object}	errors.GeneralUserNotFound404
+//	@Failure		500			{object}	errors.GeneralInternalError500
+func With(context echo.Context) error {
 	var err error
-	var dataIn serializers.GetMessagesIn
+	var dataIn serializers.WithIn
 
 	// парсинг path-параметров 
 	if err = context.Bind(&dataIn); err != nil {
@@ -51,7 +51,7 @@ func GetMessages(context echo.Context) error {
 	}
 	// если второй юзер является первым
 	if userUuid == secondUserFromDB.ID {
-		return echo.NewHTTPError(400, map[string]string{"getMessages": "another chat participant cannot be the same user"})
+		return echo.NewHTTPError(400, map[string]string{"chatWith": "another chat participant cannot be the same user"})
 	}
 
 	// получение существующего чата для этих двух юзеров или создание нового, если для них ещё нет чата
@@ -60,5 +60,5 @@ func GetMessages(context echo.Context) error {
 		return err
 	}
 
-	return context.JSON(http.StatusOK, chatForUsers)
+	return context.JSON(http.StatusOK, serializers.WithOut{ID: chatForUsers.ID})
 }

@@ -22,7 +22,7 @@ import (
 // Настройка Swagger документации
 //	@Title						SimpleChat Go API
 //	@Version					1.0
-//	@Description				This is a SimpleChat API written on Golang using Echo.
+//	@Description				This is a SimpleChat API written on Golang using Echo and Gorilla WebSocket.
 //	@Host						127.0.0.1:8000
 //	@Host						150.241.82.68
 //	@BasePath					/api

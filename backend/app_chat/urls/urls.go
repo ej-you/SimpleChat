@@ -9,5 +9,6 @@ import (
 
 
 func RouterGroup(group *echo.Group) {
-	group.GET("/get-messages/:username", handlers.GetMessages, coreMiddlewares.AuthMiddleware)
+	group.GET("/with/:username", handlers.With, coreMiddlewares.AuthMiddleware)
+	group.GET("/:id", handlers.GetChat, coreMiddlewares.AuthMiddleware)
 }
