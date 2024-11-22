@@ -22,10 +22,10 @@ import (
 //	@Produce		json
 //	@Param			LoginUserIn	body		serializers.LoginUserIn	true	"Login params"
 //	@Success		200			{object}	models.User
-//	@Failure		400			{object}	errors.UserLogin400
-//	@Failure		401			{object}	errors.UserLogin401
-//	@Failure		404			{object}	errors.UserLogin404
-//	@Failure		500			{object}	errors.General500
+//	@Failure		400			{object}	errors.GeneralValidateError400
+//	@Failure		401			{object}	errors.UserLoginInvalidPassword401
+//	@Failure		404			{object}	errors.GeneralUserNotFound404
+//	@Failure		500			{object}	errors.GeneralInternalError500
 func Login(context echo.Context) error {
 	var err error
 	var dataIn serializers.LoginUserIn

@@ -2,62 +2,17 @@ basePath: /api
 consumes:
 - application/json
 definitions:
-  errors.ChatGetMessages400:
-    description: ошибка, возникающая при указании второго участника чата как себя
+  errors.ChatNotFound404:
+    description: ошибка ненахождения чата с таким uuid в БД
     properties:
       errors:
         additionalProperties:
           type: string
         example:
-          getMessages: another chat participant cannot be the same user
+          getChat: chat with such id was not found
         type: object
       path:
-        example: /api/chat/get-messages
-        type: string
-      status:
-        example: error
-        type: string
-      statusCode:
-        example: 400
-        type: integer
-      timestamp:
-        example: 24-11-11 11:57:28 +03
-        type: string
-    type: object
-  errors.ChatGetMessages401:
-    description: ошибка отсутствия куков (истёк токен и соответственно куки авторизации
-      вместе с ним)
-    properties:
-      errors:
-        additionalProperties:
-          type: string
-        example:
-          token: missing auth cookie
-        type: object
-      path:
-        example: /api/chat/get-messages
-        type: string
-      status:
-        example: error
-        type: string
-      statusCode:
-        example: 401
-        type: integer
-      timestamp:
-        example: 24-11-11 11:57:28 +03
-        type: string
-    type: object
-  errors.ChatGetMessages404:
-    description: ошибка ненахождения юзера с таким логином в БД
-    properties:
-      errors:
-        additionalProperties:
-          type: string
-        example:
-          getUser: user with such username was not found
-        type: object
-      path:
-        example: /api/chat/get-messages
+        example: /api/chat/:id
         type: string
       status:
         example: error
@@ -69,39 +24,39 @@ definitions:
         example: 24-11-11 11:57:28 +03
         type: string
     type: object
-  errors.General500:
-    description: обычная пятисотка от сервера, которую никто не ждёт
+  errors.ChatUserIsNotParticipant403:
+    description: ошибка, возникающая при запросе юзером чата, в котором он не состоит
     properties:
       errors:
         additionalProperties:
           type: string
         example:
-          unknown: some error desc
+          getChat: forbidden
         type: object
       path:
-        example: /api/smth/shit
+        example: /api/chat/:id
         type: string
       status:
         example: error
         type: string
       statusCode:
-        example: 500
+        example: 409
         type: integer
       timestamp:
         example: 24-11-11 11:57:28 +03
         type: string
     type: object
-  errors.UserCheck400:
-    description: ошибка валидации входных данных
+  errors.ChatWithSameUser400:
+    description: ошибка, возникающая при указании второго участника чата как себя
     properties:
       errors:
         additionalProperties:
           type: string
         example:
-          username: username field must not be blank
+          chatWith: another chat participant cannot be the same user
         type: object
       path:
-        example: /api/user/login
+        example: /api/chat/with/:username
         type: string
       status:
         example: error
@@ -113,7 +68,7 @@ definitions:
         example: 24-11-11 11:57:28 +03
         type: string
     type: object
-  errors.UserCheck401:
+  errors.GeneralExpiredCredentials401:
     description: ошибка отсутствия куков (истёк токен и соответственно куки авторизации
       вместе с ним)
     properties:
@@ -136,7 +91,29 @@ definitions:
         example: 24-11-11 11:57:28 +03
         type: string
     type: object
-  errors.UserCheck404:
+  errors.GeneralInternalError500:
+    description: обычная пятисотка от сервера, которую никто не ждёт
+    properties:
+      errors:
+        additionalProperties:
+          type: string
+        example:
+          unknown: some error desc
+        type: object
+      path:
+        example: /api/some/shit
+        type: string
+      status:
+        example: error
+        type: string
+      statusCode:
+        example: 500
+        type: integer
+      timestamp:
+        example: 24-11-11 11:57:28 +03
+        type: string
+    type: object
+  errors.GeneralUserNotFound404:
     description: ошибка ненахождения юзера с таким логином в БД
     properties:
       errors:
@@ -146,7 +123,7 @@ definitions:
           getUser: user with such username was not found
         type: object
       path:
-        example: /api/user/check
+        example: /api/user/login
         type: string
       status:
         example: error
@@ -158,29 +135,7 @@ definitions:
         example: 24-11-11 11:57:28 +03
         type: string
     type: object
-  errors.UserCheck409:
-    description: ошибка проверки текущего юзера
-    properties:
-      errors:
-        additionalProperties:
-          type: string
-        example:
-          check: current user was checked
-        type: object
-      path:
-        example: /api/user/check
-        type: string
-      status:
-        example: error
-        type: string
-      statusCode:
-        example: 409
-        type: integer
-      timestamp:
-        example: 24-11-11 11:57:28 +03
-        type: string
-    type: object
-  errors.UserLogin400:
+  errors.GeneralValidateError400:
     description: ошибка валидации входных данных
     properties:
       errors:
@@ -202,7 +157,7 @@ definitions:
         example: 24-11-11 11:57:28 +03
         type: string
     type: object
-  errors.UserLogin401:
+  errors.UserLoginInvalidPassword401:
     description: ошибка неверного пароля
     properties:
       errors:
@@ -224,51 +179,7 @@ definitions:
         example: 24-11-11 11:57:28 +03
         type: string
     type: object
-  errors.UserLogin404:
-    description: ошибка ненахождения юзера с таким логином в БД
-    properties:
-      errors:
-        additionalProperties:
-          type: string
-        example:
-          getUser: user with such username was not found
-        type: object
-      path:
-        example: /api/user/login
-        type: string
-      status:
-        example: error
-        type: string
-      statusCode:
-        example: 404
-        type: integer
-      timestamp:
-        example: 24-11-11 11:57:28 +03
-        type: string
-    type: object
-  errors.UserRegister400:
-    description: ошибка валидации входных данных
-    properties:
-      errors:
-        additionalProperties:
-          type: string
-        example:
-          password: password field must not be blank
-        type: object
-      path:
-        example: /api/user/register
-        type: string
-      status:
-        example: error
-        type: string
-      statusCode:
-        example: 400
-        type: integer
-      timestamp:
-        example: 24-11-11 11:57:28 +03
-        type: string
-    type: object
-  errors.UserRegister409:
+  errors.UserRegusterAlreadyExistsError409:
     description: ошибка регистрации юзера с уже существующим (занятым) логином
     properties:
       errors:
@@ -334,14 +245,6 @@ definitions:
         example: vasya_2007
         type: string
     type: object
-  serializers.CheckOut:
-    description: выходные данные для проверки юзера на существование
-    properties:
-      isExists:
-        description: подтверждение существования такого юзера
-        example: true
-        type: boolean
-    type: object
   serializers.LoginUserIn:
     description: входные данные для входа юзера
     properties:
@@ -369,24 +272,31 @@ definitions:
         maxLength: 50
         type: string
     type: object
+  serializers.WithOut:
+    description: выходные данные получения id чата для двух юзеров
+    properties:
+      id:
+        description: uuid чата
+        example: 0aafe1fd-0088-455b-9269-0307aae15bcc
+        type: string
+    type: object
 host: 150.241.82.68
 info:
   contact: {}
-  description: This is a SimpleChat API written on Golang using Echo.
+  description: This is a SimpleChat API written on Golang using Echo and Gorilla WebSocket.
   title: SimpleChat Go API
   version: "1.0"
 paths:
-  /chat/get-messages/{username}:
+  /chat/{id}:
     get:
       consumes:
       - text/plain
-      description: Get chat messages (also chat uuid && chat participants) by username
-        of another chat participant in path parameters
-      operationId: chat-get-messages
+      description: Get chat messages and chat participants by chat uuid in path parameters
+      operationId: get-chat
       parameters:
-      - description: Get messages params
+      - description: Chat uuid
         in: path
-        name: username
+        name: id
         required: true
         type: string
       produces:
@@ -396,34 +306,33 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Chat'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/errors.ChatGetMessages400'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/errors.ChatGetMessages401'
+            $ref: '#/definitions/errors.GeneralExpiredCredentials401'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/errors.ChatUserIsNotParticipant403'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/errors.ChatGetMessages404'
+            $ref: '#/definitions/errors.ChatNotFound404'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/errors.General500'
-      summary: Get chat messages
+            $ref: '#/definitions/errors.GeneralInternalError500'
+      summary: Get chat
       tags:
       - chat
-  /user/check/{username}:
+  /chat/with/{username}:
     get:
       consumes:
       - text/plain
-      description: Check user is exists by his username (returns error if checked
-        current user)
-      operationId: user-check
+      description: Get chat id by username of another chat participant in path parameters
+      operationId: chat-with
       parameters:
-      - description: Check user is exists
+      - description: Chat participant username
         in: path
         name: username
         required: true
@@ -434,30 +343,26 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/serializers.CheckOut'
+            $ref: '#/definitions/serializers.WithOut'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/errors.UserCheck400'
+            $ref: '#/definitions/errors.ChatWithSameUser400'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/errors.UserCheck401'
+            $ref: '#/definitions/errors.GeneralExpiredCredentials401'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/errors.UserCheck404'
-        "409":
-          description: Conflict
-          schema:
-            $ref: '#/definitions/errors.UserCheck409'
+            $ref: '#/definitions/errors.GeneralUserNotFound404'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/errors.General500'
-      summary: Check user is exists
+            $ref: '#/definitions/errors.GeneralInternalError500'
+      summary: Get chat id
       tags:
-      - user
+      - chat
   /user/login:
     post:
       consumes:
@@ -481,19 +386,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/errors.UserLogin400'
+            $ref: '#/definitions/errors.GeneralValidateError400'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/errors.UserLogin401'
+            $ref: '#/definitions/errors.UserLoginInvalidPassword401'
         "404":
           description: Not Found
           schema:
-            $ref: '#/definitions/errors.UserLogin404'
+            $ref: '#/definitions/errors.GeneralUserNotFound404'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/errors.General500'
+            $ref: '#/definitions/errors.GeneralInternalError500'
       summary: Login user
       tags:
       - user
@@ -520,15 +425,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/errors.UserRegister400'
+            $ref: '#/definitions/errors.GeneralValidateError400'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/errors.UserRegister409'
+            $ref: '#/definitions/errors.UserRegusterAlreadyExistsError409'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/errors.General500'
+            $ref: '#/definitions/errors.GeneralInternalError500'
       summary: Register user
       tags:
       - user

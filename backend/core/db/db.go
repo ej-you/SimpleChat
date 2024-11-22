@@ -86,6 +86,21 @@ func (db *DB) GetUserByUsername(username string) (models.User, error) {
 }
 
 
+// получение чата (с подгрузкой его участников и сообщений) по его ID
+func (db *DB) GetChatByID(id uuid.UUID) (models.Chat, error) {
+	var chatFromDB models.Chat
+
+	selectResult := db.dbConnect.Preload("Users").Preload("Messages").Preload("Messages.Sender").First(&chatFromDB, id)
+	if err := selectResult.Error; err != nil {
+		// если ошибка в ненахождении записи
+		if err.Error() == "record not found" {
+			return models.Chat{}, echo.NewHTTPError(404, map[string]string{"getChat": "chat with such id was not found"})
+		}
+		return models.Chat{}, echo.NewHTTPError(500, map[string]string{"getChat": "failed to get chat by id: " + err.Error()})
+	}
+	return chatFromDB, nil
+}
+
 // создание нового чата
 func (db *DB) createChat(firstUserFromDB, secondUserFromDB models.User) (models.Chat, error) {
 	var chat models.Chat
@@ -107,21 +122,6 @@ func (db *DB) createChat(firstUserFromDB, secondUserFromDB models.User) (models.
 	return chat, nil
 }
 
-// получение чата по его ID
-func (db *DB) getChatByID(id uuid.UUID) (models.Chat, error) {
-	var chatFromDB models.Chat
-
-	selectResult := db.dbConnect.Preload("Users").Preload("Messages").Preload("Messages.Sender").First(&chatFromDB, id)
-	if err := selectResult.Error; err != nil {
-		// если ошибка в ненахождении записи
-		if err.Error() == "record not found" {
-			return models.Chat{}, echo.NewHTTPError(404, map[string]string{"getChat": "user with such id was not found"})
-		}
-		return models.Chat{}, echo.NewHTTPError(500, map[string]string{"getChat": "failed to get user by id: " + err.Error()})
-	}
-	return chatFromDB, nil
-}
-
 // получение чата или создание нового, если такого ещё нет 
 func (db *DB) GetOrCreateChat(firstUserID, secondUserID uuid.UUID) (models.Chat, error) {
 	var chat models.Chat
@@ -130,12 +130,12 @@ func (db *DB) GetOrCreateChat(firstUserID, secondUserID uuid.UUID) (models.Chat,
 	// получение чатов первого юзера
 	selectResult := db.dbConnect.Preload("Chats").First(&firstUserFromDB, firstUserID)
 	if err := selectResult.Error; err != nil {
-		return chat, echo.NewHTTPError(500, map[string]string{"getUser": "get chat: failed to get user by id: " + err.Error()})
+		return chat, echo.NewHTTPError(500, map[string]string{"getUser": "failed to get user by id: " + err.Error()})
 	}
 	// получение чатов второго юзера
 	selectResult = db.dbConnect.Preload("Chats").First(&secondUserFromDB, secondUserID)
 	if err := selectResult.Error; err != nil {
-		return chat, echo.NewHTTPError(500, map[string]string{"getUser": "get chat: failed to get user by id: " + err.Error()})
+		return chat, echo.NewHTTPError(500, map[string]string{"getUser": "failed to get user by id: " + err.Error()})
 	}
 
 	// совместные чаты юзеров (в контексте этого проекта он должен быть один)
@@ -146,10 +146,9 @@ func (db *DB) GetOrCreateChat(firstUserID, secondUserID uuid.UUID) (models.Chat,
 	if len(joinChats) == 0 {
 		chat, err = db.createChat(firstUserFromDB, secondUserFromDB)
 		return chat, err
-	// если пересечение было найдено, то получаем чат и все его данные
+	// если пересечение было найдено, то возвращаем чат (только его id без подгрузки участников и сообщений)
 	} else {
-		chat, err = db.getChatByID(joinChats[0].ID)
-		return chat, err
+		return joinChats[0], err
 	}
 
 	return chat, nil
