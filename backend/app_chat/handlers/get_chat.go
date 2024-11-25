@@ -39,7 +39,7 @@ func GetChat(context echo.Context) error {
 		return err
 	}
 	// получение существующего чата из БД по path-параметру-id
-	chatFromDB, err := db.NewDB().GetChatByID(dataIn.ID)
+	chatFromDB, err := db.NewDB().GetFullChatByID(dataIn.ID)
 	if err != nil {
 		return err
 	}

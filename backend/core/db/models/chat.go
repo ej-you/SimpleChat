@@ -19,8 +19,11 @@ type Chat struct {
 
 // модель сообщения
 type Message struct {
+	// id сообщения
 	ID			uuid.UUID	`gorm:"not null; type:uuid; primaryKey; autoIncrement" json:"-"`
+	// id чата
 	ChatID 		uuid.UUID	`gorm:"not null; type:uuid; index" json:"-"`
+	// id отправителя
 	SenderID 	uuid.UUID	`gorm:"not null; type:uuid" json:"-"`
 	// текст сообщения
 	Content		string 		`gorm:"not null; type: LONGTEXT" json:"content" example:"sample message"`

@@ -87,10 +87,25 @@ func (db *DB) GetUserByUsername(username string) (models.User, error) {
 
 
 // получение чата (с подгрузкой его участников и сообщений) по его ID
-func (db *DB) GetChatByID(id uuid.UUID) (models.Chat, error) {
+func (db *DB) GetFullChatByID(id uuid.UUID) (models.Chat, error) {
 	var chatFromDB models.Chat
 
 	selectResult := db.dbConnect.Preload("Users").Preload("Messages").Preload("Messages.Sender").First(&chatFromDB, id)
+	if err := selectResult.Error; err != nil {
+		// если ошибка в ненахождении записи
+		if err.Error() == "record not found" {
+			return models.Chat{}, echo.NewHTTPError(404, map[string]string{"getChat": "chat with such id was not found"})
+		}
+		return models.Chat{}, echo.NewHTTPError(500, map[string]string{"getChat": "failed to get chat by id: " + err.Error()})
+	}
+	return chatFromDB, nil
+}
+
+// получение чата (с подгрузкой его участников) по его ID
+func (db *DB) GetChatParticipantsByID(id uuid.UUID) (models.Chat, error) {
+	var chatFromDB models.Chat
+
+	selectResult := db.dbConnect.Preload("Users").First(&chatFromDB, id)
 	if err := selectResult.Error; err != nil {
 		// если ошибка в ненахождении записи
 		if err.Error() == "record not found" {

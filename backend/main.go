@@ -63,12 +63,19 @@ func main() {
 	echoApp.Use(echoMiddleware.CORSWithConfig(echoMiddleware.CORSConfig{
 		AllowOrigins: settings.CorsAllowedOrigins,
 		AllowMethods: settings.CorsAllowedMethods,
-		AllowHeaders: []string{"Content-Type", "Authorization"},
+		AllowHeaders: []string{"Content-Type", "Authorization", "Upgrade", "Sec-WebSocket-Protocol", "Sec-WebSocket-Key", "Sec-WebSocket-Version"},
 		AllowCredentials: true,
 	}))
 
-	// настройка таймаута для всех запросов на 20 секунд
+	// настройка таймаута для всех HTTP запросов на 20 секунд
 	echoApp.Use(echoMiddleware.TimeoutWithConfig(echoMiddleware.TimeoutConfig{
+		// пропускаем использование этого middleware для WebSocket соединения 
+		Skipper: func(context echo.Context) bool {
+			if context.Request().URL.Path == "/api/messanger" {
+				return true
+			}
+			return false
+		},
 		ErrorMessage: "timeout error",
 		Timeout: 20*time.Second,
 	}))

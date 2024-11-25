@@ -46,7 +46,8 @@ var CookieSameSite http.SameSite = func() http.SameSite {
 }()
 
 // время истечения действия токена
-var TokenExpiredTime time.Duration = time.Minute * 1
+// var TokenExpiredTime time.Duration = time.Minute * 1
+var TokenExpiredTime time.Duration = time.Minute * 20
 
 // путь до SQLite3 БД - os.Getenv("PATH_DB") || "./db.sqlite3"
 var PathDB = func() string {
