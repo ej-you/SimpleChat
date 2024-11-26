@@ -6,6 +6,7 @@ import (
 
 	echo "github.com/labstack/echo/v4"
 	validate "github.com/gobuffalo/validate/v3"
+    "github.com/google/uuid"
 )
 
 
@@ -88,6 +89,11 @@ func baseValidator(givenStruct validate.Validator, errors *validate.Errors) {
 				case strings.HasPrefix(fieldType, "float"):
 					// валидация для поля структуры вещественного типа
 					myFloatValidator(fieldInfo, fieldValue.Float(), myvalidTag, errors)
+				
+				// uuid
+				case fieldType == "uuid.UUID":
+					// валидация для поля структуры типа uuid
+					myUUIDValidator(fieldInfo, fieldValue.Interface().(uuid.UUID), myvalidTag, errors)
 			}
 		}		
 	}
