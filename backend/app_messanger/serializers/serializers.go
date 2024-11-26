@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 
 	"SimpleChat/backend/core/db"
+	"SimpleChat/backend/core/db/models"
 	coreValidator "SimpleChat/backend/core/validator"
 )
 
@@ -39,7 +40,8 @@ func (self *MessageIn) ParseAndValidate(rowMessage []byte) error {
 
 // получение второго участника чата
 func GetChatParticipantUUID(chatUUID, firstParticipantUUID uuid.UUID) (uuid.UUID, error) {
-	chat, err := db.NewDB().GetChatParticipantsByID(chatUUID)
+	var chat models.Chat
+	err := db.NewDB().GetChatParticipantsByID(&chat, chatUUID)
 	if err != nil {
 		return uuid.UUID{}, err
 	}

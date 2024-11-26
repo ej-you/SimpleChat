@@ -11,6 +11,7 @@ import (
 
 	coreErrorHandler "SimpleChat/backend/core/error_handler"
 	"SimpleChat/backend/core/db"
+	"SimpleChat/backend/core/db/models"
 	"SimpleChat/backend/app_messanger/serializers"
 	"SimpleChat/backend/settings"
 )
@@ -81,6 +82,8 @@ func (client *client) HandleWriteMessage(userUUID uuid.UUID) {
 	defer client.Conn.Close()
     defer delete(clients, userUUID)
 
+    dbStruct := db.NewDB()
+
 	for {
 		select {
 			// новое сообщение в канале
@@ -110,7 +113,8 @@ func (client *client) HandleWriteMessage(userUUID uuid.UUID) {
 				}
 
 				// добавление записи сообщения в БД
-				messageFromDB, err := db.NewDB().CreateMessage(clientMessage.JSONData.ChatID, userUUID, clientMessage.JSONData.Content)
+				var messageFromDB models.Message
+				err = dbStruct.CreateMessage(&messageFromDB, clientMessage.JSONData.ChatID, userUUID, clientMessage.JSONData.Content)
 				if err != nil {
 					if err := client.SendError(err); err != nil {
 						return

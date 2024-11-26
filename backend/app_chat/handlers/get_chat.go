@@ -8,6 +8,7 @@ import (
 	coreValidator "SimpleChat/backend/core/validator"
 	"SimpleChat/backend/app_chat/serializers"
 	"SimpleChat/backend/core/db"
+	"SimpleChat/backend/core/db/models"
 	"SimpleChat/backend/core/services"
 )
 
@@ -29,6 +30,7 @@ import (
 func GetChat(context echo.Context) error {
 	var err error
 	var dataIn serializers.GetChatIn
+	var chatFromDB models.Chat
 
 	// парсинг path-параметров 
 	if err = context.Bind(&dataIn); err != nil {
@@ -39,7 +41,7 @@ func GetChat(context echo.Context) error {
 		return err
 	}
 	// получение существующего чата из БД по path-параметру-id
-	chatFromDB, err := db.NewDB().GetFullChatByID(dataIn.ID)
+	err = db.NewDB().GetFullChatByID(&chatFromDB, dataIn.ID)
 	if err != nil {
 		return err
 	}
