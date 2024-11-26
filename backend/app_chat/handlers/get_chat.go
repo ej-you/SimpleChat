@@ -45,12 +45,12 @@ func GetChat(context echo.Context) error {
 	}
 
 	// получение uuid юзера из контекста запроса
-	userUuid, err := services.GetUserIDFromRequest(context)
+	userUUID, err := services.GetUserIDFromRequest(context)
 	if err != nil {
 		return err
 	}
 	// если текущий юзер не состоит в запрашиваемом чате
-	if userUuid != chatFromDB.Users[0].ID && userUuid != chatFromDB.Users[1].ID {
+	if userUUID != chatFromDB.Users[0].ID && userUUID != chatFromDB.Users[1].ID {
 		return echo.NewHTTPError(403, map[string]string{"getChat": "forbidden"})
 	}
 

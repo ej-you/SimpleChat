@@ -576,7 +576,7 @@ const docTemplate = `{
             }
         },
         "models.User": {
-            "description": "выходные даные входа и регистрации юзера",
+            "description": "выходные данные входа и регистрации юзера",
             "type": "object",
             "properties": {
                 "id": {

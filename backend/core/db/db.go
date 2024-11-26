@@ -28,7 +28,7 @@ func (db *DB) CreateUser(username, password string) (models.User, error) {
 	var newUser models.User
 
 	// генерим новый uuid для записи
-	newUuid, err := uuid.NewRandom()
+	newUUID, err := uuid.NewRandom()
 	if err != nil {
 		return newUser, echo.NewHTTPError(500, map[string]string{"createUser": "failed to create uuid for user"})
 	}
@@ -39,7 +39,7 @@ func (db *DB) CreateUser(username, password string) (models.User, error) {
 	}
 
 	newUser = models.User{
-		ID: newUuid,
+		ID: newUUID,
 		Username: username,
 		Password: passwordHash,
 	}
@@ -121,24 +121,24 @@ func (db *DB) createChat(firstUserFromDB, secondUserFromDB models.User) (models.
 	var chat models.Chat
 
 	// генерим новый uuid для записи
-	newUuid, err := uuid.NewRandom()
+	newUUID, err := uuid.NewRandom()
 	if err != nil {
 		return chat, echo.NewHTTPError(500, map[string]string{"createChat": "failed to create uuid for chat"})
 	}
 	// создаём чат с привязкой к нему двух юзеров
 	chat = models.Chat{
-		ID: newUuid,
+		ID: newUUID,
 		Users: []models.User{firstUserFromDB, secondUserFromDB},
 	}
 	createResult := db.dbConnect.Create(&chat)
 	if err := createResult.Error; err != nil {
-		return chat, echo.NewHTTPError(500, map[string]string{"createChat": "failed to create chat"})
+		return models.Chat{}, echo.NewHTTPError(500, map[string]string{"createChat": "failed to create chat"})
 	}
 	return chat, nil
 }
 
 // получение чата или создание нового, если такого ещё нет 
-func (db *DB) GetOrCreateChat(firstUserID, secondUserID uuid.UUID) (models.Chat, error) {
+func (db *DB)  GetOrCreateChat(firstUserID, secondUserID uuid.UUID) (models.Chat, error) {
 	var chat models.Chat
 
 	var firstUserFromDB, secondUserFromDB models.User
@@ -167,4 +167,37 @@ func (db *DB) GetOrCreateChat(firstUserID, secondUserID uuid.UUID) (models.Chat,
 	}
 
 	return chat, nil
+}
+
+
+// создание нового сообщения
+func (db *DB) CreateMessage(chatID, senderID uuid.UUID, content string) (models.Message, error) {
+	var newMessage models.Message
+
+	// генерим новый uuid для записи
+	newUUID, err := uuid.NewRandom()
+	if err != nil {
+		return newMessage, echo.NewHTTPError(500, map[string]string{"createMessage": "failed to create uuid for message"})
+	}
+
+	// создаём новую запись сообщения
+	newMessage = models.Message{
+		ID: newUUID,
+		ChatID: chatID,
+		SenderID: senderID,
+		Content: content,
+	}
+
+	createResult := db.dbConnect.Create(&newMessage)
+	if err := createResult.Error; err != nil {
+		return models.Message{}, echo.NewHTTPError(500, map[string]string{"createMessage": "failed to create message: " + err.Error()})
+	}
+
+	senderUser, err := db.GetUserByID(senderID)
+	if err != nil {
+		return newMessage, err
+	}
+	newMessage.Sender = senderUser
+	
+	return newMessage, nil
 }

@@ -45,17 +45,17 @@ func With(context echo.Context) error {
 	}
 
 	// получение uuid юзера из контекста запроса
-	userUuid, err := services.GetUserIDFromRequest(context)
+	userUUID, err := services.GetUserIDFromRequest(context)
 	if err != nil {
 		return err
 	}
 	// если второй юзер является первым
-	if userUuid == secondUserFromDB.ID {
+	if userUUID == secondUserFromDB.ID {
 		return echo.NewHTTPError(400, map[string]string{"chatWith": "another chat participant cannot be the same user"})
 	}
 
 	// получение существующего чата для этих двух юзеров или создание нового, если для них ещё нет чата
-	chatForUsers, err := db.NewDB().GetOrCreateChat(userUuid, secondUserFromDB.ID)
+	chatForUsers, err := db.NewDB().GetOrCreateChat(userUUID, secondUserFromDB.ID)
 	if err != nil {
 		return err
 	}

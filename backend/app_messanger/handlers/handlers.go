@@ -28,11 +28,11 @@ var upgrader = websocket.Upgrader{
 // обработка обновления соединения до WebSocket
 func UpgradeWebSocket(context echo.Context) error {
     // получение uuid юзера из контекста запроса
-    userUuid, err := services.GetUserIDFromRequest(context)
+    userUUID, err := services.GetUserIDFromRequest(context)
     if err != nil {
         return err
     }
-    fmt.Printf("Connected UserID: %s\n", userUuid)
+    fmt.Printf("Connected UserID: %s\n", userUUID)
 
 	// обновление соединения до WebSocket
     conn, err := upgrader.Upgrade(context.Response(), context.Request(), nil)
@@ -43,12 +43,12 @@ func UpgradeWebSocket(context echo.Context) error {
     // создание новой структуры клиента и добавление его в список подключённых
     newClient := client{
         Conn: conn,
-        Message: make(chan []byte),
+        Message: make(chan jsonMessageWithError),
     }
-    clients[userUuid] = newClient
+    clients[userUUID] = newClient
     
-    go newClient.HandleReadMessage(userUuid)
-    go newClient.HandleWriteMessage(userUuid)
+    go newClient.HandleReadMessage(userUUID)
+    go newClient.HandleWriteMessage(userUUID)
 
     return nil
 }

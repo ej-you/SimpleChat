@@ -19,6 +19,9 @@ var _ error = godotenv.Load("./.env")
 var Port string = os.Getenv("GO_PORT")
 var SecretForJWT string = os.Getenv("SECRET")
 
+const WebsocketPongWait = time.Second * 60
+const WebsocketPingPeriod = WebsocketPongWait * 9 / 10
+
 // настройки CORS
 var CorsAllowedOrigins []string = strings.Split(os.Getenv("CORS_ALLOWED_ORIGINS"), ",")
 var CorsAllowedMethods []string = strings.Split(os.Getenv("CORS_ALLOWED_METHODS"), ",")
@@ -46,8 +49,7 @@ var CookieSameSite http.SameSite = func() http.SameSite {
 }()
 
 // время истечения действия токена
-// var TokenExpiredTime time.Duration = time.Minute * 1
-var TokenExpiredTime time.Duration = time.Minute * 20
+var TokenExpiredTime time.Duration = time.Minute * 60
 
 // путь до SQLite3 БД - os.Getenv("PATH_DB") || "./db.sqlite3"
 var PathDB = func() string {
