@@ -90,7 +90,14 @@ func (db *DB) GetUserByUsername(username string) (models.User, error) {
 func (db *DB) GetFullChatByID(id uuid.UUID) (models.Chat, error) {
 	var chatFromDB models.Chat
 
-	selectResult := db.dbConnect.Preload("Users").Preload("Messages").Preload("Messages.Sender").First(&chatFromDB, id)
+	selectResult := db.dbConnect.Preload("Users").Preload(
+		"Messages",
+		// добавление сортировки сообщений по времени от старых к новым
+		func(db *gorm.DB) *gorm.DB {
+			return db.Order("messages.created_at ASC")
+		},
+	).Preload("Messages.Sender").First(&chatFromDB, id)
+	
 	if err := selectResult.Error; err != nil {
 		// если ошибка в ненахождении записи
 		if err.Error() == "record not found" {
