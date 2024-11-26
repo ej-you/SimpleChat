@@ -71,7 +71,7 @@ func main() {
 	echoApp.Use(echoMiddleware.TimeoutWithConfig(echoMiddleware.TimeoutConfig{
 		// пропускаем использование этого middleware для WebSocket соединения 
 		Skipper: func(context echo.Context) bool {
-			if context.Request().URL.Path == "/api/messanger" {
+			if context.Request().URL.Path == settings.WebsocketURLPath {
 				return true
 			}
 			return false

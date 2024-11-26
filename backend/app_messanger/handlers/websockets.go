@@ -17,9 +17,6 @@ import (
 )
 
 
-const webSocketPath = "/api/messanger"
-
-
 // структура с обработанным сообщением и с ошибкой
 type jsonMessageWithError struct {
 	JSONData 	serializers.MessageIn
@@ -155,7 +152,7 @@ func (client *client) HandleWriteMessage(userUUID uuid.UUID) {
 // отправка сообщения с ошибкой
 func (client *client) SendError(errorToSend error) error {
 	// создание структуры ошибки
-	errStruct, _ := coreErrorHandler.GetCustomErrorMessage(webSocketPath, errorToSend)
+	errStruct, _ := coreErrorHandler.GetCustomErrorMessage(settings.WebsocketURLPath, errorToSend)
 	// сериализация структуры ошибки
 	byteMessage, err := json.Marshal(errStruct)
 	if err != nil {

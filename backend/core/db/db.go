@@ -155,6 +155,7 @@ func (db *DB)  GetOrCreateChat(chat *models.Chat, firstUserID, secondUserID uuid
 		return err
 	// если пересечение было найдено, то возвращаем чат (только его id без подгрузки участников и сообщений)
 	} else {
+		(*chat) = joinChats[0]
 		return err
 	}
 
