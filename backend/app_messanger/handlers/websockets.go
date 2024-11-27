@@ -3,7 +3,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 
     "github.com/gorilla/websocket"
@@ -64,8 +63,7 @@ func (client *client) HandleReadMessage(userUUID uuid.UUID) {
 		// десериализация и валидация сообщения
 		clientMessage.Error = clientMessage.JSONData.ParseAndValidate(byteMessage)
 
-		fmt.Printf("Received: %v\n", clientMessage)
-
+	    settings.InfoLog.Printf("-- Received message from user %q\n", userUUID)
 		client.Message <- clientMessage
 	}
 }
@@ -88,12 +86,14 @@ func (client *client) HandleWriteMessage(userUUID uuid.UUID) {
 				// канал закрыт, закрываем соединение
 				if !ok {
 					client.Conn.WriteMessage(websocket.CloseMessage, []byte{})
+				    settings.InfoLog.Printf("-- Close connection with user %q\n", userUUID)
 					return
 				}
 				// если ошибка, то отправляем её отправителю и пропускаем дальнейшие действия
 				if clientMessage.Error != nil {
 					// если произошла ошибка при отправке, то прерываем соединение
-					if err := client.SendError(clientMessage.Error); err != nil {
+					if err := client.SendError(userUUID, clientMessage.Error); err != nil {
+					    settings.ErrorLog.Printf("failed to send error message: %v\n", err)
 						return
 					}
 					continue
@@ -103,7 +103,8 @@ func (client *client) HandleWriteMessage(userUUID uuid.UUID) {
 				// (и проверка текущего юзера на принадлежность к чату, uuid которого он отправил в сообщении)
 				participantUUID, err := serializers.GetChatParticipantUUID(clientMessage.JSONData.ChatID, userUUID)
 				if err != nil {
-					if err := client.SendError(err); err != nil {
+					if err := client.SendError(userUUID, err); err != nil {
+					    settings.ErrorLog.Printf("failed to send error message: %v\n", err)
 						return
 					}
 					continue
@@ -113,7 +114,8 @@ func (client *client) HandleWriteMessage(userUUID uuid.UUID) {
 				var messageFromDB models.Message
 				err = dbStruct.CreateMessage(&messageFromDB, clientMessage.JSONData.ChatID, userUUID, clientMessage.JSONData.Content)
 				if err != nil {
-					if err := client.SendError(err); err != nil {
+					if err := client.SendError(userUUID, err); err != nil {
+					    settings.ErrorLog.Printf("failed to send error message: %v\n", err)
 						return
 					}
 					continue
@@ -122,26 +124,33 @@ func (client *client) HandleWriteMessage(userUUID uuid.UUID) {
 				// сериализация сообщения
 				byteMessage, err := json.Marshal(messageFromDB)
 				if err != nil {
-					if err := client.SendError(err); err != nil {
+					if err := client.SendError(userUUID, err); err != nil {
+					    settings.ErrorLog.Printf("failed to send error message: %v\n", err)
 						return
 					}
 					continue
 				}
 				// отправка сообщения отправителю
 				if err = client.Conn.WriteMessage(websocket.TextMessage, byteMessage); err != nil {
+				    settings.WarnLog.Printf("close connection with user %q\n", userUUID)
 					return
 				}
+			    settings.InfoLog.Printf("-- Send message to user %q\n", userUUID)
+				
 				// поиск второго участника и отправка сообщения ему (если он есть среди подключённых клиентов)
 				participantClient, found := clients[participantUUID]
 				if found {
 					if err = participantClient.Conn.WriteMessage(websocket.TextMessage, byteMessage); err != nil {
+					    settings.WarnLog.Printf("close connection with user %q\n", userUUID)
 						return
 					}
+				    settings.InfoLog.Printf("-- Send message to user %q\n", participantUUID)
 				}
 
 			// подошло время отправки очередного PING сообщения
 			case <- pongTicker.C:
 				if err := client.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+				    settings.WarnLog.Printf("close connection with user %q\n", userUUID)
 					return
 				}
 		}
@@ -150,7 +159,7 @@ func (client *client) HandleWriteMessage(userUUID uuid.UUID) {
 
 
 // отправка сообщения с ошибкой
-func (client *client) SendError(errorToSend error) error {
+func (client *client) SendError(userUUID uuid.UUID, errorToSend error) error {
 	// создание структуры ошибки
 	errStruct, _ := coreErrorHandler.GetCustomErrorMessage(settings.WebsocketURLPath, errorToSend)
 	// сериализация структуры ошибки
@@ -161,5 +170,6 @@ func (client *client) SendError(errorToSend error) error {
 	if err = client.Conn.WriteMessage(websocket.TextMessage, byteMessage); err != nil {
 		return err
 	}
+    settings.InfoLog.Printf("-- Send error message to user %q: %q\n", userUUID, byteMessage)
 	return nil
 }

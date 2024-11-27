@@ -1,13 +1,13 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 
 	echo "github.com/labstack/echo/v4"
     "github.com/gorilla/websocket"
 
 	"SimpleChat/backend/core/services"
+    "SimpleChat/backend/settings"
 )
 
 
@@ -32,13 +32,14 @@ func UpgradeWebSocket(context echo.Context) error {
     if err != nil {
         return err
     }
-    fmt.Printf("Connected UserID: %s\n", userUUID)
 
 	// обновление соединения до WebSocket
     conn, err := upgrader.Upgrade(context.Response(), context.Request(), nil)
     if err != nil {
         return echo.NewHTTPError(400, map[string]string{"websocket": "failed to upgrade connection: " + err.Error()})
     }
+
+    settings.InfoLog.Printf("-- Open connection with user %q\n", userUUID)
 
     // создание новой структуры клиента и добавление его в список подключённых
     newClient := client{
