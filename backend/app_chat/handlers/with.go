@@ -8,6 +8,7 @@ import (
 	coreValidator "SimpleChat/backend/core/validator"
 	"SimpleChat/backend/app_chat/serializers"
 	"SimpleChat/backend/core/db"
+	"SimpleChat/backend/core/db/models"
 	"SimpleChat/backend/core/services"
 )
 
@@ -29,6 +30,10 @@ import (
 func With(context echo.Context) error {
 	var err error
 	var dataIn serializers.WithIn
+	var secondUserFromDB models.User
+	var chatForUsers models.Chat
+
+	dbStruct := db.NewDB()
 
 	// парсинг path-параметров 
 	if err = context.Bind(&dataIn); err != nil {
@@ -38,24 +43,24 @@ func With(context echo.Context) error {
 	if err = coreValidator.Validate(&dataIn); err != nil {
 		return err
 	}
-	// получение uuid собеседника из БД по path-параметру-логину
-	secondUserFromDB, err := db.NewDB().GetUserByUsername(dataIn.Username)
+	// получение собеседника из БД по path-параметру-логину
+	err = dbStruct.GetUserByUsername(&secondUserFromDB, dataIn.Username)
 	if err != nil {
 		return err
 	}
 
 	// получение uuid юзера из контекста запроса
-	userUuid, err := services.GetUserIDFromRequest(context)
+	userUUID, err := services.GetUserIDFromRequest(context)
 	if err != nil {
 		return err
 	}
 	// если второй юзер является первым
-	if userUuid == secondUserFromDB.ID {
+	if userUUID == secondUserFromDB.ID {
 		return echo.NewHTTPError(400, map[string]string{"chatWith": "another chat participant cannot be the same user"})
 	}
 
 	// получение существующего чата для этих двух юзеров или создание нового, если для них ещё нет чата
-	chatForUsers, err := db.NewDB().GetOrCreateChat(userUuid, secondUserFromDB.ID)
+	err = dbStruct.GetOrCreateChat(&chatForUsers, userUUID, secondUserFromDB.ID)
 	if err != nil {
 		return err
 	}

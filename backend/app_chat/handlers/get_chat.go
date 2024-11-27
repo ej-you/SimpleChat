@@ -8,6 +8,7 @@ import (
 	coreValidator "SimpleChat/backend/core/validator"
 	"SimpleChat/backend/app_chat/serializers"
 	"SimpleChat/backend/core/db"
+	"SimpleChat/backend/core/db/models"
 	"SimpleChat/backend/core/services"
 )
 
@@ -29,6 +30,7 @@ import (
 func GetChat(context echo.Context) error {
 	var err error
 	var dataIn serializers.GetChatIn
+	var chatFromDB models.Chat
 
 	// парсинг path-параметров 
 	if err = context.Bind(&dataIn); err != nil {
@@ -39,18 +41,18 @@ func GetChat(context echo.Context) error {
 		return err
 	}
 	// получение существующего чата из БД по path-параметру-id
-	chatFromDB, err := db.NewDB().GetChatByID(dataIn.ID)
+	err = db.NewDB().GetFullChatByID(&chatFromDB, dataIn.ID)
 	if err != nil {
 		return err
 	}
 
 	// получение uuid юзера из контекста запроса
-	userUuid, err := services.GetUserIDFromRequest(context)
+	userUUID, err := services.GetUserIDFromRequest(context)
 	if err != nil {
 		return err
 	}
 	// если текущий юзер не состоит в запрашиваемом чате
-	if userUuid != chatFromDB.Users[0].ID && userUuid != chatFromDB.Users[1].ID {
+	if userUUID != chatFromDB.Users[0].ID && userUUID != chatFromDB.Users[1].ID {
 		return echo.NewHTTPError(403, map[string]string{"getChat": "forbidden"})
 	}
 

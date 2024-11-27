@@ -1,0 +1,59 @@
+package serializers
+
+import (
+	"encoding/json"
+
+	echo "github.com/labstack/echo/v4"
+	validate "github.com/gobuffalo/validate/v3"
+	"github.com/google/uuid"
+
+	"SimpleChat/backend/core/db"
+	"SimpleChat/backend/core/db/models"
+	coreValidator "SimpleChat/backend/core/validator"
+)
+
+
+// входные данные отправки сообщения через WebSocket
+type MessageIn struct {
+	ChatID 	uuid.UUID `json:"chatId" myvalid:"required" example:"0aafe1fd-0088-455b-9269-0307aae15bcc"`
+	Content	string `json:"content" myvalid:"required" example:"sample message"`
+}
+
+// дополнительная валидация входных данных
+func (self *MessageIn) IsValid(errors *validate.Errors) {}
+
+
+// десериализация сырого сообщения в структуру и её валидация
+func (self *MessageIn) ParseAndValidate(rowMessage []byte) error {
+	// десериализация сообщения
+	err := json.Unmarshal(rowMessage, self)
+	if err != nil {
+		return echo.NewHTTPError(400, map[string]string{"message": "failed to parse JSON from message: " + err.Error()})
+	}
+	// валидация сообщения
+	if err = coreValidator.Validate(self); err != nil {
+		return err
+	}
+	return nil
+}
+
+
+// получение второго участника чата
+func GetChatParticipantUUID(chatUUID, firstParticipantUUID uuid.UUID) (uuid.UUID, error) {
+	var chat models.Chat
+	err := db.NewDB().GetChatParticipantsByID(&chat, chatUUID)
+	if err != nil {
+		return uuid.UUID{}, err
+	}
+
+	// если первый юзер не является участником этого чата, то возвращаем ошибку
+	if firstParticipantUUID != chat.Users[0].ID && firstParticipantUUID != chat.Users[1].ID {
+		return uuid.UUID{}, echo.NewHTTPError(403, map[string]string{"message": "forbidden"})
+	}
+
+	if chat.Users[0].ID == firstParticipantUUID {
+		return chat.Users[1].ID, nil
+	} else {
+		return chat.Users[0].ID, nil
+	}
+}

@@ -5,6 +5,7 @@ import (
 
 	userUrls "SimpleChat/backend/app_user/urls"
 	chatUrls "SimpleChat/backend/app_chat/urls"
+	messangerUrls "SimpleChat/backend/app_messanger/urls"
 )
 
 
@@ -15,4 +16,7 @@ func InitUrlRouters(echoApp *echo.Echo) {
 
 	apiChatGroup := echoApp.Group("/api/chat")
 	chatUrls.RouterGroup(apiChatGroup)
+
+	apiMessangerGroup := echoApp.Group("/api/messanger")
+	messangerUrls.RouterGroup(apiMessangerGroup)
 }

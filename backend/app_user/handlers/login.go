@@ -8,6 +8,7 @@ import (
 	coreValidator "SimpleChat/backend/core/validator"
 	"SimpleChat/backend/app_user/serializers"
 	"SimpleChat/backend/core/db"
+	"SimpleChat/backend/core/db/models"
 	"SimpleChat/backend/core/services"
 )
 
@@ -29,6 +30,7 @@ import (
 func Login(context echo.Context) error {
 	var err error
 	var dataIn serializers.LoginUserIn
+	var userFromDB models.User
 
 	// парсинг JSON-body
 	if err = context.Bind(&dataIn); err != nil {
@@ -39,7 +41,7 @@ func Login(context echo.Context) error {
 		return err
 	}
 	// получение юзера из БД по username'у
-	userFromDB, err := db.NewDB().GetUserByUsername(dataIn.Username)
+	err = db.NewDB().GetUserByUsername(&userFromDB, dataIn.Username)
 	if err != nil {
 		return err
 	}

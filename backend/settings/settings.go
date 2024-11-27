@@ -19,6 +19,10 @@ var _ error = godotenv.Load("./.env")
 var Port string = os.Getenv("GO_PORT")
 var SecretForJWT string = os.Getenv("SECRET")
 
+const WebsocketURLPath = "/api/messanger"
+const WebsocketPongWait = time.Second * 60
+const WebsocketPingPeriod = WebsocketPongWait * 9 / 10
+
 // настройки CORS
 var CorsAllowedOrigins []string = strings.Split(os.Getenv("CORS_ALLOWED_ORIGINS"), ",")
 var CorsAllowedMethods []string = strings.Split(os.Getenv("CORS_ALLOWED_METHODS"), ",")
@@ -46,7 +50,7 @@ var CookieSameSite http.SameSite = func() http.SameSite {
 }()
 
 // время истечения действия токена
-var TokenExpiredTime time.Duration = time.Minute * 1
+var TokenExpiredTime time.Duration = time.Minute * 60
 
 // путь до SQLite3 БД - os.Getenv("PATH_DB") || "./db.sqlite3"
 var PathDB = func() string {
@@ -65,6 +69,7 @@ var TimeFmt string = "06-01-02 15:04:05 -07"
 
 // логеры
 var InfoLog *log.Logger = log.New(os.Stdout, "[INFO]\t", log.Ldate|log.Ltime)
+var WarnLog *log.Logger = log.New(os.Stdout, "[WARN]\t", log.Ldate|log.Ltime|log.Lshortfile)
 var ErrorLog *log.Logger = log.New(os.Stderr, "[ERROR]\t", log.Ldate|log.Ltime|log.Lshortfile)
 
 // функция для обработки критических ошибок

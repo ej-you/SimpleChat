@@ -8,6 +8,7 @@ import (
 	coreValidator "SimpleChat/backend/core/validator"
 	"SimpleChat/backend/app_user/serializers"
 	"SimpleChat/backend/core/db"
+	"SimpleChat/backend/core/db/models"
 	"SimpleChat/backend/core/services"
 )
 
@@ -28,6 +29,7 @@ import (
 func Register(context echo.Context) error {
 	var err error
 	var dataIn serializers.RegisterUserIn
+	var newUser models.User
 
 	// парсинг JSON-body
 	if err = context.Bind(&dataIn); err != nil {
@@ -38,18 +40,18 @@ func Register(context echo.Context) error {
 		return err
 	}
 	// создание нового юзера в БД
-	createdUser, err := db.NewDB().CreateUser(dataIn.Username, dataIn.Password)
+	err = db.NewDB().CreateUser(&newUser, dataIn.Username, dataIn.Password)
 	if err != nil {
 		return err
 	}
 	// получение куки авторизации
 	var newAuthCookie *http.Cookie
-	newAuthCookie, err = services.GetAuthCookie(createdUser.ID)
+	newAuthCookie, err = services.GetAuthCookie(newUser.ID)
 	if err != nil {
 		return err
 	}
 	// добавление куки авторизации в ответ
 	context.SetCookie(newAuthCookie)
 
-	return context.JSON(http.StatusCreated, createdUser)
+	return context.JSON(http.StatusCreated, newUser)
 }

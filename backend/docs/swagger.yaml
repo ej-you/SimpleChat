@@ -234,7 +234,7 @@ definitions:
         description: отправитель сообщения
     type: object
   models.User:
-    description: выходные даные входа и регистрации юзера
+    description: выходные данные входа и регистрации юзера
     properties:
       id:
         description: uuid юзера

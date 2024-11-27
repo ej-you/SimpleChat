@@ -6,7 +6,7 @@ import (
 
 
 // модель юзера
-// @Description выходные даные входа и регистрации юзера
+// @Description выходные данные входа и регистрации юзера
 type User struct {
 	// uuid юзера
 	ID			uuid.UUID 	`gorm:"not null; type:uuid; primaryKey" json:"id" example:"e2f53f31-0598-4e36-b25d-41bd665764d1"`
