@@ -2,7 +2,6 @@ package handlers
 
 
 import (
-	"fmt"
 	"encoding/json"
 	"time"
 
@@ -50,7 +49,6 @@ func (this *client) HandleReadMessage(userUUID uuid.UUID, doneChan chan<- int) {
 		clientMessage.Error = clientMessage.JSONData.ParseAndValidate(byteMessage)
 
 		settings.InfoLog.Printf("-- Received message from user %q\n", userUUID)
-		fmt.Printf("\nAll connected clients: %v\n\n", clients)
 		this.Message <- clientMessage
 	}
 }

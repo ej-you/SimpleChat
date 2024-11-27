@@ -2,10 +2,10 @@
 
 ## Backend written on Golang
 
-### Swagger Docs:
-```text
-http://150.241.82.68/api/swagger/index.html
-```
+### [Swagger Docs](https://150.241.82.68/api/swagger/index.html)
+
+### [WebSocket Docs](./app_messanger/websocket_docs.md)
+
 
 ### `.env` file must contain:
 

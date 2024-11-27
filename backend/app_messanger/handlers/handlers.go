@@ -1,7 +1,6 @@
 package handlers
 
 import (
-    "fmt"
 	"net/http"
 
 	echo "github.com/labstack/echo/v4"
@@ -49,8 +48,6 @@ func UpgradeWebSocket(context echo.Context) error {
     }
     newClient.AddClient(userUUID)
 
-    fmt.Printf("\nAll connected clients: %v\n\n", clients)
-    
     done := make(chan int)
     go newClient.HandleReadMessage(userUUID, done)
     go newClient.HandleWriteMessage(userUUID, done)
