@@ -1,6 +1,7 @@
 package handlers
 
 import (
+    "fmt"
 	"net/http"
 
 	echo "github.com/labstack/echo/v4"
@@ -39,17 +40,20 @@ func UpgradeWebSocket(context echo.Context) error {
         return echo.NewHTTPError(400, map[string]string{"websocket": "failed to upgrade connection: " + err.Error()})
     }
 
-    settings.InfoLog.Printf("-- Open connection with user %q\n", userUUID)
+    settings.InfoLog.Printf("-- Open new connection with user %q\n", userUUID)
 
     // создание новой структуры клиента и добавление его в список подключённых
     newClient := client{
         Conn: conn,
         Message: make(chan jsonMessageWithError),
     }
-    clients[userUUID] = newClient
+    newClient.AddClient(userUUID)
+
+    fmt.Printf("\nAll connected clients: %v\n\n", clients)
     
-    go newClient.HandleReadMessage(userUUID)
-    go newClient.HandleWriteMessage(userUUID)
+    done := make(chan int)
+    go newClient.HandleReadMessage(userUUID, done)
+    go newClient.HandleWriteMessage(userUUID, done)
 
     return nil
 }

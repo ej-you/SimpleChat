@@ -5,7 +5,7 @@ source = ./main.go
 dest = ./go_app
 
 
-dev: swagger
+dev:
 	go run $(source)
 
 migrate:
