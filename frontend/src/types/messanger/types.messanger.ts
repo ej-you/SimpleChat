@@ -1,3 +1,5 @@
+import { Socket } from 'socket.io-client'
+
 // messanger
 export interface IMessage {
 	content: string
@@ -13,4 +15,9 @@ interface IUsers {
 export interface IChat {
 	messages: IMessage[]
 	users: IUsers[]
+}
+
+// Footer
+export type SocketProps = {
+	socket: Socket;
 }
