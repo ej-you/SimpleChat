@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { useChatStore } from '../../../store/store'
+// import { useChatStore } from '../../../store/store'
+import { useParams } from 'react-router-dom'
+import { SocketProps } from '../../../types/messanger/types.messanger'
 
-const Footer = () => {
-	const nickname = localStorage.getItem('registered') as string
-	const addMessage = useChatStore(state => state.addMessage)
+const Footer: React.FC<SocketProps> = ({socket}) => {
+	const {id} = useParams()
+	// const nickname = localStorage.getItem('registered') as string
+	// const addMessage = useChatStore(state => state.addMessage)
 	const [value, setValue] = useState('')
 	const [submitState, setSubmitState] = useState(true)
 	const textareaElement = useRef<HTMLTextAreaElement>(null)
@@ -17,12 +20,19 @@ const Footer = () => {
 
 	// Очистка поля, получение данных
 	const onSubmit: SubmitHandler<{ content: string }> = useCallback((data) => {
-		addMessage( { content: data.content, sender: {username: nickname}, createdAt: new Date().toISOString() } )
+		// addMessage( { content: data.content, sender: {username: nickname}, createdAt: new Date().toISOString() } )
+
+		const newMessage = {
+			chatId: id,
+			content: data.content,
+		}
+		socket.emit('send_message', newMessage)
+
 		reset()
 		formElement.current?.reset()
 		setSubmitState(!submitState)
 		setValue('')
-	}, [addMessage, nickname, reset, submitState])
+	}, [id, reset, socket, submitState])
 
 	// Сохранение значений поля
 	const handleChange = (e: React.FormEvent<HTMLTextAreaElement>) => {
