@@ -17,14 +17,18 @@ const Footer: React.FC<SocketProps> = ({socket}) => {
 			content: ''
 		}
 	})
+	
+	// определение устройства
+	const isMobileDevice = () => {
+    return /Mobi|Android/i.test(navigator.userAgent);
+	}
 
 	// Очистка поля, получение данных
 	const onSubmit: SubmitHandler<{ content: string }> = useCallback((data) => {
 		// addMessage( { content: data.content, sender: {username: nickname}, createdAt: new Date().toISOString() } )
-
 		const newMessage = {
 			chatId: id,
-			content: data.content,
+			content: data.content.trim(),
 		}
 		socket.emit('send_message', newMessage)
 
@@ -41,14 +45,12 @@ const Footer: React.FC<SocketProps> = ({socket}) => {
 		setFormValue('content', newValue)
 	}
 
-	// Ctrl + shift - перенос строки, enter - отправка
+	// Ctrl + shift - перенос строки, enter - отправка. enter - перенос строки для мобил
 	const handleKeyDown = (e: React.KeyboardEvent) => {
-		if (value.trim() === '') {
-			if (e.key === 'Enter') {
-				e.preventDefault()
-			}
+		if (value.trim() === '' && e.key === 'Enter' && !isMobileDevice()) {
+			e.preventDefault()
 		} else {
-			if (e.key === 'Enter' && !e.shiftKey) {
+			if (e.key === 'Enter' && !e.shiftKey && !isMobileDevice()) {
 				e.preventDefault()
 				handleSubmit(onSubmit)()
 			}
@@ -68,7 +70,10 @@ const Footer: React.FC<SocketProps> = ({socket}) => {
 			<hr className='w-full border-background-400' />
 			<form className='flex gap-4' ref={formElement} onSubmit={handleSubmit(onSubmit)}>
 				<textarea 
-					{...register('content', {required: true})}
+					{...register('content', {
+						required: true,
+						validate: value => value.trim() !== ''
+					})}
 					ref={textareaElement}
 					tabIndex={0}
 					rows={1}
