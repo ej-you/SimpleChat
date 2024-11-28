@@ -17,11 +17,15 @@ const Footer: React.FC<SocketProps> = ({socket}) => {
 			content: ''
 		}
 	})
+	
+	// определение устройства
+	// const isMobileDevice = () => {
+  //   return /Mobi|Android/i.test(navigator.userAgent);
+	// }
 
 	// Очистка поля, получение данных
 	const onSubmit: SubmitHandler<{ content: string }> = useCallback((data) => {
 		// addMessage( { content: data.content, sender: {username: nickname}, createdAt: new Date().toISOString() } )
-
 		const newMessage = {
 			chatId: id,
 			content: data.content,
@@ -68,7 +72,10 @@ const Footer: React.FC<SocketProps> = ({socket}) => {
 			<hr className='w-full border-background-400' />
 			<form className='flex gap-4' ref={formElement} onSubmit={handleSubmit(onSubmit)}>
 				<textarea 
-					{...register('content', {required: true})}
+					{...register('content', {
+						required: true,
+						validate: value => value.trim() !== ''
+					})}
 					ref={textareaElement}
 					tabIndex={0}
 					rows={1}
