@@ -11,6 +11,7 @@ const socket = io('wss://150.241.82.68/api/messanger')
 
 const Messanger = () => {
 	const nav = useNavigate()
+	const addMessage = useChatStore(store => store.addMessage)
 	const nickname = localStorage.getItem('registered') as string
 	const chatRef = useRef<HTMLDivElement>(null)
 
@@ -29,14 +30,14 @@ const Messanger = () => {
 	// получение сообщений
 	useEffect(() => {
 		socket.on('receive_message', (newMessage) => {
-			// useChatStore.getState().addMessage(newMessage)
+			addMessage( { content: newMessage.content, sender: newMessage.sender, createdAt: newMessage.createdAt } )
 			console.log(newMessage)
 		})
 
 		return () => {
 			socket.off('receive_message')
 		}
-	}, [])
+	}, [addMessage])
 
 	const chat = useChatStore(state => state.chatData) as IChat
 	const companion = chat && chat.users.filter(el => el.username !== nickname)
