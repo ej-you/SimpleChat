@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-// import { useChatStore } from '../../../store/store'
 import { useParams } from 'react-router-dom'
-import { SocketProps } from '../../../types/messanger/types.messanger'
+import { io } from 'socket.io-client'
+import { useChatStore } from '../../../store/store'
 
-const Footer: React.FC<SocketProps> = ({socket}) => {
+const socket = io('wss://150.241.82.68/api/messanger')
+
+const Footer: React.FC= () => {
 	const {id} = useParams()
-	// const nickname = localStorage.getItem('registered') as string
-	// const addMessage = useChatStore(state => state.addMessage)
+	const addMessage = useChatStore(state => state.addMessage)
 	const [value, setValue] = useState('')
 	const [submitState, setSubmitState] = useState(true)
 	const textareaElement = useRef<HTMLTextAreaElement>(null)
@@ -20,12 +21,24 @@ const Footer: React.FC<SocketProps> = ({socket}) => {
 	
 	// определение устройства
 	const isMobileDevice = () => {
-    return /Mobi|Android/i.test(navigator.userAgent);
+    return /Mobi|Android/i.test(navigator.userAgent)
 	}
 
-	// Очистка поля, получение данных
+	// получение сообщений
+	useEffect(() => {
+		socket.on('receive_message', (newMessage) => {
+			addMessage( { content: newMessage.content, sender: newMessage.sender, createdAt: newMessage.createdAt } )
+			console.log(newMessage)
+		})
+
+		return () => {
+			socket.off('receive_message')
+		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
+
+	// Очистка поля, отправка сообщений
 	const onSubmit: SubmitHandler<{ content: string }> = useCallback((data) => {
-		// addMessage( { content: data.content, sender: {username: nickname}, createdAt: new Date().toISOString() } )
 		const newMessage = {
 			chatId: id,
 			content: data.content.trim(),
@@ -36,7 +49,7 @@ const Footer: React.FC<SocketProps> = ({socket}) => {
 		formElement.current?.reset()
 		setSubmitState(!submitState)
 		setValue('')
-	}, [id, reset, socket, submitState])
+	}, [id, reset, submitState])
 
 	// Сохранение значений поля
 	const handleChange = (e: React.FormEvent<HTMLTextAreaElement>) => {
