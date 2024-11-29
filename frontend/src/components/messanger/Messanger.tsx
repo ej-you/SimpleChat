@@ -6,12 +6,9 @@ import Error from '../error/Error'
 import Message from './message/Message'
 import Footer from './footer/Footer'
 import { IChat, IMessage } from '../../types/messanger/types.messanger'
-import { io } from 'socket.io-client'
-const socket = io('wss://150.241.82.68/api/messanger')
 
 const Messanger = () => {
 	const nav = useNavigate()
-	const addMessage = useChatStore(store => store.addMessage)
 	const nickname = localStorage.getItem('registered') as string
 	const chatRef = useRef<HTMLDivElement>(null)
 
@@ -26,18 +23,6 @@ const Messanger = () => {
 		getMessages()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
-
-	// получение сообщений
-	useEffect(() => {
-		socket.on('receive_message', (newMessage) => {
-			addMessage( { content: newMessage.content, sender: newMessage.sender, createdAt: newMessage.createdAt } )
-			console.log(newMessage)
-		})
-
-		return () => {
-			socket.off('receive_message')
-		}
-	}, [addMessage])
 
 	const chat = useChatStore(state => state.chatData) as IChat
 	const companion = chat && chat.users.filter(el => el.username !== nickname)
@@ -69,7 +54,7 @@ const Messanger = () => {
 					}
 				</main>
 
-				<Footer socket={socket} />
+				<Footer />
 
 			</div>
 		</>
