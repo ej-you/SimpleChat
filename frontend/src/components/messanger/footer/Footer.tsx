@@ -1,18 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
-import { io } from 'socket.io-client'
-import { useChatStore } from '../../../store/store'
-
-const socket = io('wss://150.241.82.68/api/messanger')
+// import { useChatStore } from '../../../store/store'
 
 const Footer: React.FC= () => {
+	// Инициализация переменных
 	const {id} = useParams()
-	const addMessage = useChatStore(state => state.addMessage)
+	// const addMessage = useChatStore(state => state.addMessage)
 	const [value, setValue] = useState('')
 	const [submitState, setSubmitState] = useState(true)
 	const textareaElement = useRef<HTMLTextAreaElement>(null)
 	const formElement = useRef<HTMLFormElement>(null)
+	const webSocket = useRef<WebSocket | null>(null);
 	const { handleSubmit, register, setValue: setFormValue, reset } = useForm<{ content: string }>({
 		defaultValues: {
 			content: ''
@@ -21,30 +20,42 @@ const Footer: React.FC= () => {
 	
 	// определение устройства
 	const isMobileDevice = () => {
-    return /Mobi|Android/i.test(navigator.userAgent)
+		return /Mobi|Android/i.test(navigator.userAgent)
 	}
-
-	// получение сообщений
+	
+	// Получение сообщений
 	useEffect(() => {
-		socket.on('receive_message', (newMessage) => {
-			addMessage( { content: newMessage.content, sender: newMessage.sender, createdAt: newMessage.createdAt } )
-			console.log(newMessage)
-		})
+		webSocket.current = new WebSocket('https://150.241.82.68/api/messanger')
+		
+		webSocket.current.onopen = () => console.log("WebSocket opened")
+		webSocket.current.onclose = () => console.log("WebSocket closed")
+		webSocket.current.onerror = (error) => console.error("WebSocket error", error)
+		
+		webSocket.current.onmessage = (e) => {
+			// addMessage( { content: e.data.content, sender: e.data.sender, createdAt: e.data.createdAt } )
+			console.log(e.data)
+		}
 
 		return () => {
-			socket.off('receive_message')
+			if (webSocket.current) {
+				webSocket.current.close()
+			}
 		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
-	// Очистка поля, отправка сообщений
+	// Отправка сообщений, очистка полей
 	const onSubmit: SubmitHandler<{ content: string }> = useCallback((data) => {
+		// Отправка
 		const newMessage = {
 			chatId: id,
 			content: data.content.trim(),
 		}
-		socket.emit('send_message', newMessage)
 
+		if (webSocket.current && webSocket.current.readyState === WebSocket.OPEN) {
+			webSocket.current.send(JSON.stringify(newMessage))
+		}
+
+		// Очистка
 		reset()
 		formElement.current?.reset()
 		setSubmitState(!submitState)
