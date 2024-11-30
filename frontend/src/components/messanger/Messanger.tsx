@@ -37,7 +37,7 @@ const Messanger = () => {
 	return (
 		<>
 			<Error />
-			<div className='h-screen flex flex-col py-10 px-60'>
+			<div className='h-screen flex flex-col py-10 px-2 sm:px-10 2xl:px-60'>
 
 				<header className='flex items-center justify-center relative'>
 					<Link to='/' className='absolute left-0 text-primary underline cursor-pointer font-bold'>Back</Link>
