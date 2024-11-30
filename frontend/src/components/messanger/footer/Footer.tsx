@@ -34,7 +34,6 @@ const Footer: React.FC= () => {
 		webSocket.current.onmessage = (e) => {
 			const data = JSON.parse(e.data)
 			addMessage( { content: data.content, sender: {id: data.sender.id, username: data.sender.username}, createdAt: data.createdAt } )
-			console.log(e.data)
 		}
 
 		return () => {
