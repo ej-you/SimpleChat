@@ -33,6 +33,10 @@ FROM alpine:3.20 AS run
 # install make util for Makefile
 RUN apk add --no-cache make
 
+# set up timezote to Europe/Moscow (+3)
+RUN apk add --no-cache tzdata
+RUN ln -s /usr/share/zoneinfo/Etc/GMT-3 /etc/localtime
+
 # make dir for logs
 RUN mkdir /logs
 
