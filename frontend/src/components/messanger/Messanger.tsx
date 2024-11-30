@@ -27,7 +27,7 @@ const Messanger = () => {
 	const chat = useChatStore(state => state.chatData) as IChat
 	const companion = chat && chat.users.filter(el => el.username !== nickname)
 
-	// Скролл чата
+	// Авто-скролл чата вниз
 	useEffect(() => {
 		if (chatRef.current) {
 			chatRef.current.scrollTop = chatRef.current.scrollHeight;

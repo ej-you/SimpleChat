@@ -20,7 +20,7 @@ const useGetMessages = () => {
         setErrorContent((err as AxiosError).message)
         setTimeout(() => {
 					localStorage.removeItem('registered')
-					nav('/signup')
+					nav('/signin')
 				}, 1000);
       } else{
         console.error(err)
