@@ -32,7 +32,7 @@ const Auth: React.FC<IAuthProps> = ({onSubmit}) => {
 
           <div className="">
             <div className="relative">
-              <input {...register('username', {required: true})} type="text" id="floating_outlined" className="block w-full text-subtitle-gray bg-transparent font-bold appearance-none py-2.5 px-4 rounded-xl border-2  outline-none" autoComplete='off'/>
+              <input {...register('username', {required: true})} type="text" id="floating_outlined" className="block w-full text-subtitle-gray bg-transparent font-bold appearance-none py-2.5 px-4 rounded-xl border-2  outline-none" autoComplete='off' autoFocus/>
               <label htmlFor="floating_outlined" className="absolute text-sm text-subtitle-gray duration-300 transform -translate-y-4  top-2.5 z-10 origin-[0] bg-background-800 px-0.5 start-3">Login</label>
             </div>
             {errors.username && <p className='text-sm text-error'>Enter login</p>}
