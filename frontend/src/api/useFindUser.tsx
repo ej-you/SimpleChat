@@ -18,8 +18,8 @@ const useFindUser = () => {
         setErrorContent((err as AxiosError).message)
 				setTimeout(() => {
 					localStorage.removeItem('registered')
-					nav('/signup')
-				}, 1000);
+					nav('/signin')
+				}, 1000)
       } else{
         console.error(err)
         setErrorContent((err as AxiosError).message)

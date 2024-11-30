@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
-// import { useChatStore } from '../../../store/store'
+import { useChatStore } from '../../../store/store'
 
 const Footer: React.FC= () => {
 	// Инициализация переменных
 	const {id} = useParams()
-	// const addMessage = useChatStore(state => state.addMessage)
+	const addMessage = useChatStore(state => state.addMessage)
 	const [value, setValue] = useState('')
 	const [submitState, setSubmitState] = useState(true)
 	const textareaElement = useRef<HTMLTextAreaElement>(null)
@@ -32,16 +32,17 @@ const Footer: React.FC= () => {
 		webSocket.current.onerror = (error) => console.error("WebSocket error", error)
 		
 		webSocket.current.onmessage = (e) => {
-			// addMessage( { content: e.data.content, sender: e.data.sender, createdAt: e.data.createdAt } )
+			const data = JSON.parse(e.data)
+			addMessage( { content: data.content, sender: {id: data.sender.id, username: data.sender.username}, createdAt: data.createdAt } )
 			console.log(e.data)
 		}
 
 		return () => {
-			if (webSocket.current) {
-				webSocket.current.close()
+			if (webSocket.current && webSocket.current.readyState === WebSocket.OPEN) {
+				webSocket.current.close();
 			}
 		}
-	}, [])
+	}, [addMessage])
 
 	// Отправка сообщений, очистка полей
 	const onSubmit: SubmitHandler<{ content: string }> = useCallback((data) => {
@@ -50,7 +51,6 @@ const Footer: React.FC= () => {
 			chatId: id,
 			content: data.content.trim(),
 		}
-
 		if (webSocket.current && webSocket.current.readyState === WebSocket.OPEN) {
 			webSocket.current.send(JSON.stringify(newMessage))
 		}
