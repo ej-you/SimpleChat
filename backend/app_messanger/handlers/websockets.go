@@ -17,7 +17,7 @@ import (
 
 
 // обработка входящих сообщений
-func (this *client) HandleReadMessage(userUUID uuid.UUID, doneChan chan<- int) {
+func (this *client) HandleReadMessage(doneChan chan<- int) {
 	defer this.Conn.Close()
 	defer close(this.Message)
 
@@ -37,7 +37,7 @@ func (this *client) HandleReadMessage(userUUID uuid.UUID, doneChan chan<- int) {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseNormalClosure) { // websocket.CloseGoingAway, websocket.CloseAbnormalClosure
 				settings.ErrorLog.Printf("unexpectedCloseError: %v", err)
 			}
-			settings.InfoLog.Printf("-- Close connection with user %q\n", userUUID)
+			settings.InfoLog.Printf("-- Close connection with user %q (chat with %q)\n", this.UserUUID, this.ParticipantUUID)
 			// посылаем сообщение в канал для завершения работы горутины отправки сообщений
 			doneChan <- 0
 			return
@@ -48,19 +48,19 @@ func (this *client) HandleReadMessage(userUUID uuid.UUID, doneChan chan<- int) {
 		// десериализация и валидация сообщения
 		clientMessage.Error = clientMessage.JSONData.ParseAndValidate(byteMessage)
 
-		settings.InfoLog.Printf("-- Received message from user %q\n", userUUID)
+		settings.InfoLog.Printf("-- Received message from user %q (chat with %q)\n", this.UserUUID, this.ParticipantUUID)
 		this.Message <- clientMessage
 	}
 }
 
 // отправка сообщения
-func (this *client) HandleWriteMessage(userUUID uuid.UUID, doneChan <-chan int) {
+func (this *client) HandleWriteMessage(doneChan <-chan int) {
 	// настройка тикера отправки PING сообщений для проверки активности соединения
 	pongTicker := time.NewTicker(settings.WebsocketPingPeriod)
 
 	defer pongTicker.Stop()
 	defer this.Conn.Close()
-	defer this.RemoveClient(userUUID)
+	defer this.RemoveClient()
 
 	dbStruct := db.NewDB()
 
@@ -71,13 +71,13 @@ func (this *client) HandleWriteMessage(userUUID uuid.UUID, doneChan <-chan int) 
 				// канал закрыт, закрываем соединение
 				if !ok {
 					this.Conn.WriteMessage(websocket.CloseMessage, []byte{})
-					settings.InfoLog.Printf("-- Close connection with user %q\n", userUUID)
+					settings.InfoLog.Printf("-- Close connection with user %q (chat with %q)\n", this.UserUUID, this.ParticipantUUID)
 					return
 				}
 				// если ошибка, то отправляем её отправителю и пропускаем дальнейшие действия
 				if clientMessage.Error != nil {
 					// если произошла ошибка при отправке, то прерываем соединение
-					if err := this.SendError(userUUID, clientMessage.Error); err != nil {
+					if err := this.SendError(clientMessage.Error); err != nil {
 						settings.ErrorLog.Printf("failed to send error message: %v\n", err)
 						return
 					}
@@ -86,9 +86,9 @@ func (this *client) HandleWriteMessage(userUUID uuid.UUID, doneChan <-chan int) 
 
 				// получение uuid другого участника
 				// (и проверка текущего юзера на принадлежность к чату, uuid которого он отправил в сообщении)
-				participantUUID, err := serializers.GetChatParticipantUUID(clientMessage.JSONData.ChatID, userUUID)
+				participantUUID, err := serializers.GetChatParticipantUUID(clientMessage.JSONData.ChatID, this.UserUUID)
 				if err != nil {
-					if err := this.SendError(userUUID, err); err != nil {
+					if err := this.SendError(err); err != nil {
 						settings.ErrorLog.Printf("failed to send error message: %v\n", err)
 						return
 					}
@@ -97,9 +97,9 @@ func (this *client) HandleWriteMessage(userUUID uuid.UUID, doneChan <-chan int) 
 
 				// добавление записи сообщения в БД
 				var messageFromDB models.Message
-				err = dbStruct.CreateMessage(&messageFromDB, clientMessage.JSONData.ChatID, userUUID, clientMessage.JSONData.Content)
+				err = dbStruct.CreateMessage(&messageFromDB, clientMessage.JSONData.ChatID, this.UserUUID, clientMessage.JSONData.Content)
 				if err != nil {
-					if err := this.SendError(userUUID, err); err != nil {
+					if err := this.SendError(err); err != nil {
 						settings.ErrorLog.Printf("failed to send error message: %v\n", err)
 						return
 					}
@@ -109,15 +109,15 @@ func (this *client) HandleWriteMessage(userUUID uuid.UUID, doneChan <-chan int) 
 				// сериализация сообщения
 				byteMessage, err := json.Marshal(messageFromDB)
 				if err != nil {
-					if err := this.SendError(userUUID, err); err != nil {
+					if err := this.SendError(err); err != nil {
 						settings.ErrorLog.Printf("failed to send error message: %v\n", err)
 						return
 					}
 					continue
 				}
 				// отправка сообщения отправителю (всем подключениям юзера с текущим uuid)
-				if err = this.SendMessageToClients(userUUID, byteMessage); err != nil {
-					settings.WarnLog.Printf("close connection with user %q\n", userUUID)
+				if err = this.SendMessageToClients(this.UserUUID, byteMessage); err != nil {
+					settings.WarnLog.Printf("close connection with user %q (chat with %q)\n", this.UserUUID, this.ParticipantUUID)
 					return
 				}
 				// поиск второго участника и отправка сообщения ему (если он есть среди подключённых клиентов)
@@ -126,7 +126,7 @@ func (this *client) HandleWriteMessage(userUUID uuid.UUID, doneChan <-chan int) 
 			// подошло время отправки очередного PING сообщения
 			case <- pongTicker.C:
 				if err := this.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
-					settings.WarnLog.Printf("close connection with user %q\n", userUUID)
+					settings.WarnLog.Printf("close connection with user %q (chat with %q)\n", this.UserUUID, this.ParticipantUUID)
 					return
 				}
 
@@ -139,7 +139,7 @@ func (this *client) HandleWriteMessage(userUUID uuid.UUID, doneChan <-chan int) 
 
 
 // отправка сообщения с ошибкой только текущему подключению юзера
-func (this *client) SendError(userUUID uuid.UUID, errorToSend error) error {
+func (this *client) SendError(errorToSend error) error {
 	// создание структуры ошибки
 	errStruct, _ := coreErrorHandler.GetCustomErrorMessage(settings.WebsocketURLPath, errorToSend)
 	// сериализация структуры ошибки
@@ -150,7 +150,7 @@ func (this *client) SendError(userUUID uuid.UUID, errorToSend error) error {
 	if err = this.Conn.WriteMessage(websocket.TextMessage, byteMessage); err != nil {
 		return err
 	}
-	settings.InfoLog.Printf("-- Send error message to user %q: %q\n", userUUID, byteMessage)
+	settings.InfoLog.Printf("-- Send error message to user %q: %q\n", this.UserUUID, byteMessage)
 	return nil
 }
 
@@ -165,6 +165,13 @@ func (this *client) SendMessageToClients(userUUID uuid.UUID, byteMessage []byte)
 	}
 
 	for _, c := range clientConnections {
+		// 1. Текущий клиент получает обработанное сообщение обратно и все его подключения, в которых второй участник чата тот же, что и в этом подключении
+		// 2. ИЛИ Участник получает обработанное сообщение от данного клиента, если у него вторым участником чата является текущий клиент 
+		// Сдесь обрабатывается обратный случай для преждевременного окончания итерации
+		if !(this.UserUUID == userUUID && this.ParticipantUUID == c.ParticipantUUID) && !(this.ParticipantUUID == userUUID && this.UserUUID == c.ParticipantUUID) {
+			continue
+		}
+
 		loopErr = c.Conn.WriteMessage(websocket.TextMessage, byteMessage)
 		if loopErr != nil {
 			// если ошибка при отправке сообщения текущему клиенту
@@ -172,9 +179,9 @@ func (this *client) SendMessageToClients(userUUID uuid.UUID, byteMessage []byte)
 				sendErr = loopErr
 			}
 			continue
-			settings.WarnLog.Printf("failed to send message to user %q\n", userUUID)
+			settings.WarnLog.Printf("failed to send message to user %q (from %q)\n", userUUID, this.UserUUID)
 		}
-		settings.InfoLog.Printf("-- Send message to user %q\n", userUUID)
+		settings.InfoLog.Printf("-- Send message to user %q (from %q)\n", userUUID, this.UserUUID)
 	}
 	if sendErr != nil {
 		return sendErr
