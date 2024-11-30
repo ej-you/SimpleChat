@@ -32,13 +32,14 @@ const Footer: React.FC= () => {
 		webSocket.current.onerror = (error) => console.error("WebSocket error", error)
 		
 		webSocket.current.onmessage = (e) => {
-			addMessage( { content: e.data.content, sender: e.data.sender.username, createdAt: e.data.createdAt } )
+			const data = JSON.parse(e.data)
+			addMessage( { content: data.content, sender: {id: data.sender.id, username: data.sender.username}, createdAt: data.createdAt } )
 			console.log(e.data)
 		}
 
 		return () => {
-			if (webSocket.current) {
-				webSocket.current.close()
+			if (webSocket.current && webSocket.current.readyState === WebSocket.OPEN) {
+				webSocket.current.close();
 			}
 		}
 	}, [addMessage])
@@ -50,7 +51,6 @@ const Footer: React.FC= () => {
 			chatId: id,
 			content: data.content.trim(),
 		}
-
 		if (webSocket.current && webSocket.current.readyState === WebSocket.OPEN) {
 			webSocket.current.send(JSON.stringify(newMessage))
 		}
