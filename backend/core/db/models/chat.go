@@ -22,7 +22,7 @@ type Message struct {
 	// id сообщения
 	ID			uuid.UUID	`gorm:"not null; type:uuid; primaryKey; autoIncrement" json:"-"`
 	// id чата
-	ChatID 		uuid.UUID	`gorm:"not null; type:uuid; index" json:"-"`
+	ChatID 		uuid.UUID	`gorm:"not null; type:uuid; index" json:"chatId"`
 	// id отправителя
 	SenderID 	uuid.UUID	`gorm:"not null; type:uuid" json:"-"`
 	// текст сообщения

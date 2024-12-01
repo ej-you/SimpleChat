@@ -37,7 +37,7 @@ func (this *client) HandleReadMessage(doneChan chan<- int) {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseNormalClosure) { // websocket.CloseGoingAway, websocket.CloseAbnormalClosure
 				settings.ErrorLog.Printf("unexpectedCloseError: %v", err)
 			}
-			settings.InfoLog.Printf("-- Close connection with user %q (chat with %q)\n", this.UserUUID, this.ParticipantUUID)
+			settings.InfoLog.Printf("-- Close connection with user %q\n", this.UserUUID)
 			// посылаем сообщение в канал для завершения работы горутины отправки сообщений
 			doneChan <- 0
 			return
@@ -48,7 +48,7 @@ func (this *client) HandleReadMessage(doneChan chan<- int) {
 		// десериализация и валидация сообщения
 		clientMessage.Error = clientMessage.JSONData.ParseAndValidate(byteMessage)
 
-		settings.InfoLog.Printf("-- Received message from user %q (chat with %q)\n", this.UserUUID, this.ParticipantUUID)
+		settings.InfoLog.Printf("-- Received message from user %q\n", this.UserUUID)
 		this.Message <- clientMessage
 	}
 }
@@ -71,7 +71,7 @@ func (this *client) HandleWriteMessage(doneChan <-chan int) {
 				// канал закрыт, закрываем соединение
 				if !ok {
 					this.Conn.WriteMessage(websocket.CloseMessage, []byte{})
-					settings.InfoLog.Printf("-- Close connection with user %q (chat with %q)\n", this.UserUUID, this.ParticipantUUID)
+					settings.InfoLog.Printf("-- Close connection with user %q\n", this.UserUUID)
 					return
 				}
 				// если ошибка, то отправляем её отправителю и пропускаем дальнейшие действия
@@ -117,7 +117,7 @@ func (this *client) HandleWriteMessage(doneChan <-chan int) {
 				}
 				// отправка сообщения отправителю (всем подключениям юзера с текущим uuid)
 				if err = this.SendMessageToClients(this.UserUUID, byteMessage); err != nil {
-					settings.WarnLog.Printf("close connection with user %q (chat with %q)\n", this.UserUUID, this.ParticipantUUID)
+					settings.WarnLog.Printf("close connection with user %q\n", this.UserUUID)
 					return
 				}
 				// поиск второго участника и отправка сообщения ему (если он есть среди подключённых клиентов)
@@ -126,7 +126,7 @@ func (this *client) HandleWriteMessage(doneChan <-chan int) {
 			// подошло время отправки очередного PING сообщения
 			case <- pongTicker.C:
 				if err := this.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
-					settings.WarnLog.Printf("close connection with user %q (chat with %q)\n", this.UserUUID, this.ParticipantUUID)
+					settings.WarnLog.Printf("close connection with user %q\n", this.UserUUID)
 					return
 				}
 
@@ -165,13 +165,6 @@ func (this *client) SendMessageToClients(userUUID uuid.UUID, byteMessage []byte)
 	}
 
 	for _, c := range clientConnections {
-		// 1. Текущий клиент получает обработанное сообщение обратно и все его подключения, в которых второй участник чата тот же, что и в этом подключении
-		// 2. ИЛИ Участник получает обработанное сообщение от данного клиента, если у него вторым участником чата является текущий клиент 
-		// Сдесь обрабатывается обратный случай для преждевременного окончания итерации
-		if !(this.UserUUID == userUUID && this.ParticipantUUID == c.ParticipantUUID) && !(this.ParticipantUUID == userUUID && this.UserUUID == c.ParticipantUUID) {
-			continue
-		}
-
 		loopErr = c.Conn.WriteMessage(websocket.TextMessage, byteMessage)
 		if loopErr != nil {
 			// если ошибка при отправке сообщения текущему клиенту

@@ -22,8 +22,6 @@ type client struct {
     Conn 			*websocket.Conn
     // id клиента, с которым установлено соединение
     UserUUID 		uuid.UUID
-    // id участника чата, с которым клиент общается по данному соединению
-    ParticipantUUID uuid.UUID
     // канал для хранения входящего сообщения от клиента
     Message 		chan jsonMessageWithError
 }
