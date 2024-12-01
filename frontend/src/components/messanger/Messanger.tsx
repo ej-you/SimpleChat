@@ -14,7 +14,7 @@ const Messanger = () => {
 
 	useEffect(() => {
 		if (!nickname) {
-			nav('/signin')
+			nav('/signup')
 		}
 	}, [nav, nickname])
 
