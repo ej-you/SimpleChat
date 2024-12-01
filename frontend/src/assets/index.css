@@ -14,6 +14,7 @@ body, html {
   align-items: center;
 }
 #root {
+  position: relative;
   width: 100%;
 }
 .main::-webkit-scrollbar, textarea::-webkit-scrollbar{

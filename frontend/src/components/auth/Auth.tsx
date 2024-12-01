@@ -9,7 +9,7 @@ const Auth: React.FC<IAuthProps> = ({onSubmit}) => {
 	return (
     <>
     <Error />
-		<div className="flex flex-col justify-center h-screen items-center text-center gap-12">
+		<div className="flex flex-col justify-center h-dvh items-center text-center gap-12">
       <div className="flex flex-col gap-2">
         <h1 className='text-title text-xl font-bold'>Messanger</h1>
 

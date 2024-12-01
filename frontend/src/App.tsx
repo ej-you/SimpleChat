@@ -10,7 +10,7 @@ function App() {
 
   useEffect(() =>{
     if(!localStorage.getItem('registered')){
-      nav('/signin')
+      nav('/signup')
     }
   },[nav])
 
@@ -19,7 +19,7 @@ function App() {
   return (
     <>
     <Error />
-    <div className="flex flex-col justify-center h-screen items-center text-center gap-12">
+    <div className="flex flex-col justify-center h-dvh items-center text-center gap-12">
       <div className="flex flex-col gap-2">
         <h1 className='text-title text-xl font-bold'>Find user for chatting</h1>
 				<h2 className='text-subtitle-gray font-bold'>type user username</h2>
