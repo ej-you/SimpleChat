@@ -34,13 +34,14 @@ const Footer: React.FC= () => {
 		
 		webSocket.current.onmessage = (e) => {
 			const data = JSON.parse(e.data)
-			if(data.id === id){
+			console.log(data)
+			if(data.chatId === id){
 				addMessage( { content: data.content, sender: {id: data.sender.id, username: data.sender.username}, createdAt: data.createdAt } )
 			} else{
 				setNotifyContent(`Сообщение от ${data.sender.username}`)
 				setTimeout(() => {
 					setNotifyContent('')
-				}, 1000);
+				}, 2000);
 			}
 		}
 
