@@ -4,6 +4,12 @@ export interface IErrors {
 	setErrorContent: (newErrorContent: string) => void;
 }
 
+// useNotifyStore
+export interface INotify {
+	notifyContent: string;
+	setNotifyContent: (newNotifyContent: string) => void;
+}
+
 // UseCompanionStore
 export interface ICompanion {
 	companion: string

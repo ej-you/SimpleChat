@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
-import { useChatStore } from '../../../store/store'
+import { useChatStore, useNotifyStore } from '../../../store/store'
 
 const Footer: React.FC= () => {
 	// Инициализация переменных
 	const {id} = useParams()
 	const addMessage = useChatStore(state => state.addMessage)
+	const setNotifyContent = useNotifyStore(state => state.setNotifyContent)
 	const [value, setValue] = useState('')
 	const [submitState, setSubmitState] = useState(true)
 	const textareaElement = useRef<HTMLTextAreaElement>(null)
@@ -33,7 +34,14 @@ const Footer: React.FC= () => {
 		
 		webSocket.current.onmessage = (e) => {
 			const data = JSON.parse(e.data)
-			addMessage( { content: data.content, sender: {id: data.sender.id, username: data.sender.username}, createdAt: data.createdAt } )
+			if(data.id === id){
+				addMessage( { content: data.content, sender: {id: data.sender.id, username: data.sender.username}, createdAt: data.createdAt } )
+			} else{
+				setNotifyContent(`Сообщение от ${data.sender.username}`)
+				setTimeout(() => {
+					setNotifyContent('')
+				}, 1000);
+			}
 		}
 
 		return () => {
@@ -41,7 +49,7 @@ const Footer: React.FC= () => {
 				webSocket.current.close();
 			}
 		}
-	}, [addMessage])
+	}, [addMessage, id, setNotifyContent])
 
 	// Отправка сообщений, очистка полей, фокус на поле
 	const onSubmit: SubmitHandler<{ content: string }> = useCallback((data) => {
