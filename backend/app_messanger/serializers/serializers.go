@@ -13,6 +13,22 @@ import (
 )
 
 
+// входные данные для получения чата для двух юзеров и сообщений из этого чата
+type GetChatIn struct {
+	// id чата
+	ParticipantID uuid.UUID `header:"ParticipantID" myvalid:"required" example:"0aafe1fd-0088-455b-9269-0307aae15bcc"`
+}
+
+// дополнительная валидация входных данных
+func (self *GetChatIn) IsValid(errors *validate.Errors) {}
+
+
+
+
+
+
+
+
 // входные данные отправки сообщения через WebSocket
 type MessageIn struct {
 	ChatID 	uuid.UUID `json:"chatId" myvalid:"required" example:"0aafe1fd-0088-455b-9269-0307aae15bcc"`

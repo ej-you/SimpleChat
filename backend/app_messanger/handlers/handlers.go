@@ -44,13 +44,14 @@ func UpgradeWebSocket(context echo.Context) error {
     // создание новой структуры клиента и добавление его в список подключённых
     newClient := client{
         Conn: conn,
+        UserUUID: userUUID,
         Message: make(chan jsonMessageWithError),
     }
-    newClient.AddClient(userUUID)
+    newClient.AddClient()
 
     done := make(chan int)
-    go newClient.HandleReadMessage(userUUID, done)
-    go newClient.HandleWriteMessage(userUUID, done)
+    go newClient.HandleReadMessage(done)
+    go newClient.HandleWriteMessage(done)
 
     return nil
 }
