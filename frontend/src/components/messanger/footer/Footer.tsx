@@ -43,7 +43,7 @@ const Footer: React.FC= () => {
 		}
 	}, [addMessage])
 
-	// Отправка сообщений, очистка полей
+	// Отправка сообщений, очистка полей, фокус на поле
 	const onSubmit: SubmitHandler<{ content: string }> = useCallback((data) => {
 		// Отправка
 		const newMessage = {
@@ -59,6 +59,9 @@ const Footer: React.FC= () => {
 		formElement.current?.reset()
 		setSubmitState(!submitState)
 		setValue('')
+
+		// Фокус
+		textareaElement.current?.focus()
 	}, [id, reset, submitState])
 
 	// Сохранение значений поля
@@ -107,7 +110,7 @@ const Footer: React.FC= () => {
 					}}
 
 					className='w-full h-fit resize-none text-white placeholder:text-subtitle-gray font-bold bg-background-400 appearance-none py-3 px-4 rounded-xl border-subtitle-gray outline-none'
-				
+					
 					placeholder='Type here...'
 					onKeyDown={handleKeyDown} 
 					onInput={(e) => {
