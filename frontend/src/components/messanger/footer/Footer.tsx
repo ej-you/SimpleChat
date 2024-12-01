@@ -9,7 +9,7 @@ const Footer: React.FC= () => {
 	const addMessage = useChatStore(state => state.addMessage)
 	const setNotifyContent = useNotifyStore(state => state.setNotifyContent)
 	const currentUser = localStorage.getItem('registered')
-	const [value, setValue] = useState('')
+	const [value, setValue] = useState<string>('')
 	const [submitState, setSubmitState] = useState(true)
 	const textareaElement = useRef<HTMLTextAreaElement>(null)
 	const formElement = useRef<HTMLFormElement>(null)
@@ -73,11 +73,9 @@ const Footer: React.FC= () => {
 		setValue('')
 
 		// Фокус
-		if(textareaElement.current?.focus()){
-			textareaElement.current?.focus()
-		}
+		textareaElement.current?.focus()
 	}, [id, reset, submitState])
-
+	
 	// Сохранение значений поля
 	const handleChange = (e: React.FormEvent<HTMLTextAreaElement>) => {
 		const newValue = (e.target as HTMLTextAreaElement).value
