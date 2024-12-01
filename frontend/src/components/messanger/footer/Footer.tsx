@@ -125,6 +125,7 @@ const Footer: React.FC= () => {
 
 					className='w-full h-fit resize-none text-white placeholder:text-subtitle-gray font-bold bg-background-400 appearance-none py-3 px-4 rounded-xl border-subtitle-gray outline-none'
 					
+					autoFocus
 					placeholder='Type here...'
 					onKeyDown={handleKeyDown} 
 					onInput={(e) => {
