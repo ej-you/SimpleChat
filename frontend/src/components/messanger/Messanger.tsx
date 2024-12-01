@@ -46,7 +46,7 @@ const Messanger = () => {
 				<header className='flex items-center justify-center relative'>
 					<Link to='/' className='absolute left-0 text-primary underline cursor-pointer font-bold'>Back</Link>
 					{chat && (
-					<h1 className='text-title text-xl font-bold'>
+					<h1 className='text-title text-xl font-bold truncate max-w-64'>
 						{companion[0] ? companion[0].username : 'Собеседник'}
 					</h1>
 					)}
