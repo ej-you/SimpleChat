@@ -8,9 +8,8 @@ const useGetMessages = () => {
   const {id} = useParams()
   const setErrorContent = useErrorStore(state => state.setErrorContent)
   const setChatData = useChatStore(state => state.setChatData)
-
 	const getMessages = async () => {
-		setErrorContent('')
+    setErrorContent('')
     try{
       const res = await axios.get(`https://150.241.82.68/api/chat/${id}`, {withCredentials: true,})
       setChatData(res.data)

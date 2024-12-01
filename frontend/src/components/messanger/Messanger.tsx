@@ -9,18 +9,20 @@ import { IChat, IMessage } from '../../types/messanger/types.messanger'
 import Notify from '../notify/Notify'
 
 const Messanger = () => {
+	const setChatData = useChatStore(state => state.setChatData)
 	const nav = useNavigate()
 	const nickname = localStorage.getItem('registered') as string
 	const chatRef = useRef<HTMLDivElement>(null)
-
+	
 	useEffect(() => {
 		if (!nickname) {
 			nav('/signup')
 		}
 	}, [nav, nickname])
-
+	
 	const { getMessages } = useGetMessages()
 	useEffect(() => {
+		setChatData(null)
 		getMessages()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])

@@ -8,6 +8,7 @@ const Footer: React.FC= () => {
 	const {id} = useParams()
 	const addMessage = useChatStore(state => state.addMessage)
 	const setNotifyContent = useNotifyStore(state => state.setNotifyContent)
+	const currentUser = localStorage.getItem('registered')
 	const [value, setValue] = useState('')
 	const [submitState, setSubmitState] = useState(true)
 	const textareaElement = useRef<HTMLTextAreaElement>(null)
@@ -38,10 +39,12 @@ const Footer: React.FC= () => {
 			if(data.chatId === id){
 				addMessage( { content: data.content, sender: {id: data.sender.id, username: data.sender.username}, createdAt: data.createdAt } )
 			} else{
-				setNotifyContent(`Сообщение от ${data.sender.username}`)
-				setTimeout(() => {
-					setNotifyContent('')
-				}, 2000);
+				if(data.sender.username !== currentUser){
+					setNotifyContent(`Сообщение от ${data.sender.username}`)
+					setTimeout(() => {
+						setNotifyContent('')
+					}, 2000);
+				}
 			}
 		}
 
@@ -50,7 +53,7 @@ const Footer: React.FC= () => {
 				webSocket.current.close();
 			}
 		}
-	}, [addMessage, id, setNotifyContent])
+	}, [addMessage, currentUser, id, setNotifyContent])
 
 	// Отправка сообщений, очистка полей, фокус на поле
 	const onSubmit: SubmitHandler<{ content: string }> = useCallback((data) => {
@@ -70,7 +73,9 @@ const Footer: React.FC= () => {
 		setValue('')
 
 		// Фокус
-		textareaElement.current?.focus()
+		if(textareaElement.current?.focus()){
+			textareaElement.current?.focus()
+		}
 	}, [id, reset, submitState])
 
 	// Сохранение значений поля

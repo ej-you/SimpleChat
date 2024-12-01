@@ -31,6 +31,6 @@ interface IChatData {
 
 export interface IChatStore {
 	chatData: IChatData | null
-	setChatData: (newChatData: IChatData) => void
+	setChatData: (newChatData: IChatData | null) => void
 	addMessage: (newMessage: IMessage) => void
 }
