@@ -6,6 +6,7 @@ import Error from '../error/Error'
 import Message from './message/Message'
 import Footer from './footer/Footer'
 import { IChat, IMessage } from '../../types/messanger/types.messanger'
+import Notify from '../notify/Notify'
 
 const Messanger = () => {
 	const nav = useNavigate()
@@ -36,6 +37,7 @@ const Messanger = () => {
 
 	return (
 		<>
+			<Notify />
 			<Error />
 			<div className='h-dvh flex flex-col py-4 lg:py-10 px-2 sm:px-10 2xl:px-60'>
 

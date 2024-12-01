@@ -1,6 +1,6 @@
 import { useNotifyStore } from '../../store/store'
 
-const Error = () => {
+const Notify = () => {
 	const notifyContent = useNotifyStore(state => state.notifyContent)
 	
 	return (
@@ -11,4 +11,4 @@ const Error = () => {
 	)
 }
 
-export default Error
+export default Notify
