@@ -40,10 +40,11 @@ const Auth: React.FC<IAuthProps> = ({onSubmit}) => {
 
           <div className="">
             <div className="relative">
-              <input {...register('password', {required: true})} type="password" id="floating_outlined2" className='block w-full text-subtitle-gray bg-transparent font-bold appearance-none py-2.5 px-4 rounded-xl border-2 outline-none' autoComplete='off'/>
+              <input {...register('password', {required: true, minLength: 8})} type="password" id="floating_outlined2" className='block w-full text-subtitle-gray bg-transparent font-bold appearance-none py-2.5 px-4 rounded-xl border-2 outline-none' autoComplete='off'/>
               <label htmlFor="floating_outlined2" className="absolute text-sm text-subtitle-gray duration-300 transform -translate-y-4  top-2.5 z-10 origin-[0] bg-background-800 px-0.5 start-3">Password</label>
             </div>
-            {errors.password && <p className='text-sm text-error'>Enter password</p>}
+            {errors.password && errors.password.type === 'required' && <p className='text-sm text-error'>Enter password</p>}
+            {errors.password && errors.password.type === 'minLength' && <p className='text-sm text-error'>Password from 8 characters</p>}
           </div>
 
         </div>
