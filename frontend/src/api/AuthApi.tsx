@@ -4,8 +4,7 @@ import { useErrorStore } from '../store/store'
 import Auth from '../components/auth/Auth'
 import { useEffect } from 'react'
 import { IAuthApiProps } from '../types/props/types.props'
-import axios, { AxiosError } from 'axios'
-
+import axios from 'axios'
 
 const AuthApi:React.FC<IAuthApiProps> = ({ apiUrl }) => {
   const nav = useNavigate()
@@ -23,8 +22,9 @@ const AuthApi:React.FC<IAuthApiProps> = ({ apiUrl }) => {
       localStorage.setItem('registered', data.username)
       nav('/')
     } catch (err) {
-      console.error(err)
-      setErrorContent((err as AxiosError).message)
+      const error = (err as { response: { data: { errors: string } } }).response.data.errors
+      const errorMessages = Object.values(error)
+      setErrorContent(errorMessages[0])
     }
   }
 

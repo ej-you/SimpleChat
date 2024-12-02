@@ -1,11 +1,13 @@
 import { useNavigate } from 'react-router-dom'
 import { useErrorStore } from '../store/store'
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 import { FieldValues } from 'react-hook-form'
+import UseError from '../hooks/useError'
 
 const useFindUser = () => {
 	const nav = useNavigate()
 	const setErrorContent = useErrorStore(store => store.setErrorContent)
+	const {handleError} = UseError()
 
 	const findUser = async (data: FieldValues) => {
 		setErrorContent('')
@@ -13,15 +15,7 @@ const useFindUser = () => {
 			const res = await axios.get(`https://150.241.82.68/api/chat/with/${data.findUserByName}`, {withCredentials: true,})
 			nav(`/messanger/${res.data.id}`)
 		} catch(err) {
-			console.error(err)
-			setErrorContent((err as AxiosError).message)
-			// если истек токен
-      if((err as AxiosError).status === 401){
-				setTimeout(() => {
-					localStorage.removeItem('registered')
-					nav('/signin')
-				}, 1000)
-      }
+			handleError(err)
 		}
 	}
 
