@@ -24,7 +24,6 @@ const Footer: React.FC= () => {
 	const isMobileDevice = () => {
 		return /Mobi|Android/i.test(navigator.userAgent)
 	}
-	
 	// Получение сообщений
 	useEffect(() => {
 		webSocket.current = new WebSocket('https://150.241.82.68/api/messanger')
@@ -65,7 +64,9 @@ const Footer: React.FC= () => {
 		if (webSocket.current && webSocket.current.readyState === WebSocket.OPEN) {
 			webSocket.current.send(JSON.stringify(newMessage))
 		}
-
+		if (webSocket.current?.readyState === WebSocket.CLOSED || webSocket.current?.readyState === WebSocket.CLOSING) {
+			webSocket.current = new WebSocket('https://150.241.82.68/api/messanger')
+		}
 		// Очистка
 		reset()
 		formElement.current?.reset()
