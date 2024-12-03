@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
 import { useChatStore, useNotifyStore } from '../../../store/store'
-import useGetMessages from '../../../api/useGetMessages'
 
 const Footer: React.FC= () => {
 	// Инициализация переменных
@@ -10,7 +9,6 @@ const Footer: React.FC= () => {
 	const addMessage = useChatStore(state => state.addMessage)
 	const setNotifyContent = useNotifyStore(state => state.setNotifyContent)
 	const currentUser = localStorage.getItem('registered')
-	const {getMessages} = useGetMessages()
 	const [value, setValue] = useState<string>('')
 	const [submitState, setSubmitState] = useState(true)
 	const textareaElement = useRef<HTMLTextAreaElement>(null)
@@ -26,32 +24,23 @@ const Footer: React.FC= () => {
 	const isMobileDevice = () => {
 		return /Mobi|Android/i.test(navigator.userAgent)
 	}
+
 	// Получение сообщений
-	const connectWebSocket = useCallback(() => {
+	
+	useEffect(() => {
 		webSocket.current = new WebSocket('https://150.241.82.68/api/messanger')
-
+		
 		webSocket.current.onopen = () => console.log("WebSocket opened")
-
-		webSocket.current.onclose = () => {
-			console.log("WebSocket closed")
-			if(window.location.pathname.startsWith('/messanger/')){
-				getMessages()
-				setTimeout(connectWebSocket, 1000)
-			}
-		}
-
-		webSocket.current.onerror = (error) => {
-			console.error("WebSocket error", error)
-			webSocket.current?.close()
-		}
-
+		webSocket.current.onclose = () => console.log("WebSocket closed")
+		webSocket.current.onerror = (error) => console.error("WebSocket error", error)
+	
 		webSocket.current.onmessage = (e) => {
 			const data = JSON.parse(e.data)
 			console.log(data)
-			if (data.chatId === id) {
-				addMessage({ content: data.content, sender: { id: data.sender.id, username: data.sender.username }, createdAt: data.createdAt })
-			} else {
-				if (data.sender.username !== currentUser ) {
+			if(data.chatId === id){
+				addMessage( { content: data.content, sender: {id: data.sender.id, username: data.sender.username}, createdAt: data.createdAt } )
+			} else{
+				if(data.sender.username !== currentUser){
 					setNotifyContent(`Сообщение от ${data.sender.username}`)
 					setTimeout(() => {
 						setNotifyContent('')
@@ -59,17 +48,13 @@ const Footer: React.FC= () => {
 				}
 			}
 		}
-	}, [addMessage, currentUser, getMessages, id, setNotifyContent])
-
-	useEffect(() => {
-		connectWebSocket();
 
 		return () => {
 			if (webSocket.current && webSocket.current.readyState === WebSocket.OPEN) {
 				webSocket.current.close()
 			}
 		}
-	}, [connectWebSocket])
+	}, [addMessage, currentUser, id, setNotifyContent, webSocket])
 
 	// Отправка сообщений, очистка полей, фокус на поле
 	const onSubmit: SubmitHandler<{ content: string }> = useCallback((data) => {
@@ -90,7 +75,7 @@ const Footer: React.FC= () => {
 
 		// Фокус
 		textareaElement.current?.focus()
-	}, [id, reset, submitState])
+	}, [id, reset, submitState, webSocket])
 	
 	// Сохранение значений поля
 	const handleChange = (e: React.FormEvent<HTMLTextAreaElement>) => {
