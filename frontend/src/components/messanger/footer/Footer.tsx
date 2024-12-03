@@ -82,7 +82,7 @@ const Footer: React.FC= () => {
 
 		// Фокус
 		textareaElement.current?.focus()
-	}, [id, reset, submitState])
+	}, [getMessages, id, reset, submitState])
 	
 	// Сохранение значений поля
 	const handleChange = (e: React.FormEvent<HTMLTextAreaElement>) => {
