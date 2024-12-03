@@ -56,6 +56,9 @@ const Footer: React.FC= () => {
 
 	// Отправка сообщений, очистка полей, фокус на поле
 	const onSubmit: SubmitHandler<{ content: string }> = useCallback((data) => {
+		if (webSocket.current?.readyState === WebSocket.CLOSED || webSocket.current?.readyState === WebSocket.CLOSING) {
+			webSocket.current = new WebSocket('https://150.241.82.68/api/messanger')
+		}
 		// Отправка
 		const newMessage = {
 			chatId: id,
@@ -63,9 +66,6 @@ const Footer: React.FC= () => {
 		}
 		if (webSocket.current && webSocket.current.readyState === WebSocket.OPEN) {
 			webSocket.current.send(JSON.stringify(newMessage))
-		}
-		if (webSocket.current?.readyState === WebSocket.CLOSED || webSocket.current?.readyState === WebSocket.CLOSING) {
-			webSocket.current = new WebSocket('https://150.241.82.68/api/messanger')
 		}
 		// Очистка
 		reset()
