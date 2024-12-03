@@ -9,8 +9,8 @@ const Footer: React.FC= () => {
 	const {id} = useParams()
 	const addMessage = useChatStore(state => state.addMessage)
 	const setNotifyContent = useNotifyStore(state => state.setNotifyContent)
-	const {getMessages} = useGetMessages()
 	const currentUser = localStorage.getItem('registered')
+	const {getMessages} = useGetMessages()
 	const [value, setValue] = useState<string>('')
 	const [submitState, setSubmitState] = useState(true)
 	const textareaElement = useRef<HTMLTextAreaElement>(null)
@@ -26,45 +26,53 @@ const Footer: React.FC= () => {
 	const isMobileDevice = () => {
 		return /Mobi|Android/i.test(navigator.userAgent)
 	}
-
 	// Получение сообщений
-	useEffect(() => {
+	const connectWebSocket = useCallback(() => {
 		webSocket.current = new WebSocket('https://150.241.82.68/api/messanger')
-		
+
 		webSocket.current.onopen = () => console.log("WebSocket opened")
-		webSocket.current.onclose = () => console.log("WebSocket closed")
-		webSocket.current.onerror = (error) => console.error("WebSocket error", error)
+
+		webSocket.current.onclose = () => {
+			console.log("WebSocket closed")
+			if(window.location.pathname.startsWith('/messanger/')){
+				getMessages()
+				setTimeout(connectWebSocket, 1000)
+			}
+		}
+
+		webSocket.current.onerror = (error) => {
+			console.error("WebSocket error", error)
+			webSocket.current?.close()
+		}
 
 		webSocket.current.onmessage = (e) => {
 			const data = JSON.parse(e.data)
 			console.log(data)
-			if(data.chatId === id){
-				addMessage( { content: data.content, sender: {id: data.sender.id, username: data.sender.username}, createdAt: data.createdAt } )
-			} else{
-				if(data.sender.username !== currentUser){
+			if (data.chatId === id) {
+				addMessage({ content: data.content, sender: { id: data.sender.id, username: data.sender.username }, createdAt: data.createdAt })
+			} else {
+				if (data.sender.username !== currentUser ) {
 					setNotifyContent(`Сообщение от ${data.sender.username}`)
 					setTimeout(() => {
 						setNotifyContent('')
-					}, 2000);
+					}, 2000)
 				}
 			}
 		}
+	}, [addMessage, currentUser, getMessages, id, setNotifyContent])
+
+	useEffect(() => {
+		connectWebSocket();
 
 		return () => {
 			if (webSocket.current && webSocket.current.readyState === WebSocket.OPEN) {
-				webSocket.current.close();
+				webSocket.current.close()
 			}
 		}
-	}, [addMessage, currentUser, id, setNotifyContent])
+	}, [connectWebSocket])
 
-	// Восстановление подключения, отправка сообщений, очистка полей, фокус на поле
+	// Отправка сообщений, очистка полей, фокус на поле
 	const onSubmit: SubmitHandler<{ content: string }> = useCallback((data) => {
-		// Восстановление
-		if (webSocket.current?.readyState === WebSocket.CLOSED || webSocket.current?.readyState === WebSocket.CLOSING) {
-			getMessages()
-			webSocket.current = new WebSocket('https://150.241.82.68/api/messanger')
-		}
-		
 		// Отправка
 		const newMessage = {
 			chatId: id,
@@ -82,7 +90,7 @@ const Footer: React.FC= () => {
 
 		// Фокус
 		textareaElement.current?.focus()
-	}, [getMessages, id, reset, submitState])
+	}, [id, reset, submitState])
 	
 	// Сохранение значений поля
 	const handleChange = (e: React.FormEvent<HTMLTextAreaElement>) => {
