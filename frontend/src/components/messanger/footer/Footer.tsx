@@ -2,12 +2,14 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useParams } from 'react-router-dom'
 import { useChatStore, useNotifyStore } from '../../../store/store'
+import useGetMessages from '../../../api/useGetMessages'
 
 const Footer: React.FC= () => {
 	// Инициализация переменных
 	const {id} = useParams()
 	const addMessage = useChatStore(state => state.addMessage)
 	const setNotifyContent = useNotifyStore(state => state.setNotifyContent)
+	const {getMessages} = useGetMessages()
 	const currentUser = localStorage.getItem('registered')
 	const [value, setValue] = useState<string>('')
 	const [submitState, setSubmitState] = useState(true)
@@ -24,6 +26,7 @@ const Footer: React.FC= () => {
 	const isMobileDevice = () => {
 		return /Mobi|Android/i.test(navigator.userAgent)
 	}
+
 	// Получение сообщений
 	useEffect(() => {
 		webSocket.current = new WebSocket('https://150.241.82.68/api/messanger')
@@ -31,7 +34,7 @@ const Footer: React.FC= () => {
 		webSocket.current.onopen = () => console.log("WebSocket opened")
 		webSocket.current.onclose = () => console.log("WebSocket closed")
 		webSocket.current.onerror = (error) => console.error("WebSocket error", error)
-		
+
 		webSocket.current.onmessage = (e) => {
 			const data = JSON.parse(e.data)
 			console.log(data)
@@ -54,11 +57,14 @@ const Footer: React.FC= () => {
 		}
 	}, [addMessage, currentUser, id, setNotifyContent])
 
-	// Отправка сообщений, очистка полей, фокус на поле
+	// Восстановление подключения, отправка сообщений, очистка полей, фокус на поле
 	const onSubmit: SubmitHandler<{ content: string }> = useCallback((data) => {
+		// Восстановление
 		if (webSocket.current?.readyState === WebSocket.CLOSED || webSocket.current?.readyState === WebSocket.CLOSING) {
+			getMessages()
 			webSocket.current = new WebSocket('https://150.241.82.68/api/messanger')
 		}
+		
 		// Отправка
 		const newMessage = {
 			chatId: id,
@@ -67,6 +73,7 @@ const Footer: React.FC= () => {
 		if (webSocket.current && webSocket.current.readyState === WebSocket.OPEN) {
 			webSocket.current.send(JSON.stringify(newMessage))
 		}
+
 		// Очистка
 		reset()
 		formElement.current?.reset()
