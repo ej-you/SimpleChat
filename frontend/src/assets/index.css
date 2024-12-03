@@ -13,6 +13,10 @@ body, html {
   justify-content: center;
   align-items: center;
 }
+.text{
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
 #root {
   position: relative;
   width: 100%;
