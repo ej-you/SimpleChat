@@ -13,6 +13,9 @@ body, html {
   justify-content: center;
   align-items: center;
 }
+.width{
+  max-width: 90%;
+}
 .text{
   overflow-wrap: break-word;
   word-break: break-word;
