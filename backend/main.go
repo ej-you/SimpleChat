@@ -84,7 +84,7 @@ func main() {
 	coreUrls.InitURLRouters(echoApp)
 
 	// настройка Swagger документации
-	echoApp.GET("/api/swagger/*", echoSwagger.WrapHandler)
+	echoApp.GET("/simple-chat/api/swagger/*", echoSwagger.WrapHandler)
 
 	// запуск приложения
 	echoApp.Logger.Fatal(echoApp.Start(fmt.Sprintf(":%s", settings.Port)))

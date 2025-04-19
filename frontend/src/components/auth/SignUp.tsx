@@ -2,7 +2,7 @@ import AuthApi from '../../api/AuthApi'
 
 const SignUp = () => {
   return (
-    <AuthApi apiUrl='https://fredcv.ru:8091/api/user/register'/>
+    <AuthApi apiUrl='https://fredcv.ru:8091/simple-chat/api/user/register'/>
   )
 }
 

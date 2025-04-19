@@ -37,7 +37,7 @@ func GetAuthCookie(userID uuid.UUID) (*http.Cookie, error) {
 	cookie := http.Cookie{
 		Name:     "simple-chat-auth",
 		Value:    token,
-		Path:     "/api/",
+		Path:     "/simple-chat/api/",
 		HttpOnly: true,
 		Secure:   settings.CookieSecure,
 		SameSite: http.SameSiteNoneMode,

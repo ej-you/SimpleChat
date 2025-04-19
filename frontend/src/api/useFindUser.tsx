@@ -12,7 +12,7 @@ const useFindUser = () => {
 	const findUser = async (data: FieldValues) => {
 		setErrorContent('')
 		try {
-			const res = await axios.get(`https://fredcv.ru:8091/api/chat/with/${data.findUserByName}`, {withCredentials: true,})
+			const res = await axios.get(`https://fredcv.ru:8091/simple-chat/api/chat/with/${data.findUserByName}`, {withCredentials: true,})
 			nav(`/messanger/${res.data.id}`)
 		} catch(err) {
 			handleError(err)
