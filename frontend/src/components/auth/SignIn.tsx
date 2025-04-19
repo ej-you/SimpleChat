@@ -2,7 +2,7 @@ import AuthApi from '../../api/AuthApi'
 
 const SignIn = () => {
 	return (
-		<AuthApi apiUrl='https://web-server/api/user/login'/>
+		<AuthApi apiUrl='https://fredcv.ru:8091/api/user/login'/>
 	)
 }
 
