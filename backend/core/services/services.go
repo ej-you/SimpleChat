@@ -4,7 +4,6 @@ import (
 	"SimpleChat/backend/core/db/models"
 )
 
-
 // нахождение пересечения двух срезов с чатами юзеров
 func IntersectUserChats(firstSlice, secondSlice []models.Chat) []models.Chat {
 	intersect := make([]models.Chat, 0)

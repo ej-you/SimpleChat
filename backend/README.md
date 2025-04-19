@@ -1,5 +1,9 @@
 # SimpleChat
 
+(*clean-arch*)
+
+<hr>
+
 ## Backend written on Golang
 
 ### [Swagger Docs](https://150.241.82.68/api/swagger/index.html)

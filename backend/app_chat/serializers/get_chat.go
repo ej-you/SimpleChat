@@ -1,10 +1,9 @@
 package serializers
 
 import (
-	"github.com/google/uuid"
 	validate "github.com/gobuffalo/validate/v3"
+	"github.com/google/uuid"
 )
-
 
 // входные данные для получения чата для двух юзеров и сообщений из этого чата
 type GetChatIn struct {
@@ -13,4 +12,4 @@ type GetChatIn struct {
 }
 
 // дополнительная валидация входных данных
-func (self *GetChatIn) IsValid(errors *validate.Errors) {}
+func (chat *GetChatIn) IsValid(_ *validate.Errors) {}

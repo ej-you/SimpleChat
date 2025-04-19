@@ -5,15 +5,15 @@ import (
 
 	echo "github.com/labstack/echo/v4"
 
-	coreValidator "SimpleChat/backend/core/validator"
 	"SimpleChat/backend/app_user/serializers"
 	"SimpleChat/backend/core/db"
 	"SimpleChat/backend/core/db/models"
 	"SimpleChat/backend/core/services"
+	coreValidator "SimpleChat/backend/core/validator"
 )
 
-
 // эндпоинт для регистрации юзера
+//
 //	@Summary		Register user
 //	@Description	Register new user with form
 //	@Router			/user/register [post]
@@ -32,11 +32,13 @@ func Register(context echo.Context) error {
 	var newUser models.User
 
 	// парсинг JSON-body
-	if err = context.Bind(&dataIn); err != nil {
+	err = context.Bind(&dataIn)
+	if err != nil {
 		return err
 	}
 	// валидация полученной структуры
-	if err = coreValidator.Validate(&dataIn); err != nil {
+	err = coreValidator.Validate(&dataIn)
+	if err != nil {
 		return err
 	}
 	// создание нового юзера в БД

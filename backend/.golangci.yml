@@ -1,0 +1,105 @@
+version: "2"
+
+run:
+  tests: false
+
+linters:
+  default: none
+  enable:
+    - asciicheck
+    - bodyclose
+    - copyloopvar
+    - cyclop
+    - dogsled
+    - dupl
+    - errcheck
+    - errorlint
+    - funlen
+    - ginkgolinter
+    - gochecknoinits
+    - goconst
+    - gocritic
+    - gocyclo
+    - godox
+    - goprintffuncname
+    - gosec
+    - ineffassign
+    - makezero
+    - misspell
+    - mnd
+    - nakedret
+    - nestif
+    - noctx
+    - prealloc
+    - revive
+    - unconvert
+    - unparam
+    - unused
+    - varnamelen
+    - whitespace
+
+  settings:
+    cyclop:
+      max-complexity: 10
+    errorlint:
+      comparison: true
+    goconst:
+      ignore-string-values: .*?%s|%v|%w.*
+      numbers: true
+      ignore-calls: false
+    gocritic:
+      enable-all: true
+    gocyclo:
+      min-complexity: 10
+    nestif:
+      min-complexity: 3
+    prealloc:
+      simple: false
+      for-loops: true
+    whitespace:
+      multi-func: true
+
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      # this issue should be fixed, but need frontend developer fixes too
+      - linters:
+          - misspell
+        text: "`messanger` is a misspelling of `messenger`"
+      - linters:
+          - varnamelen
+        text: "variable name 'ok' is too short for the scope of its usage"
+      - linters:
+          - revive
+        text: "var-naming: don't use an underscore in package name"
+      - linters:
+          - revive
+        path: core/db/connection\.go
+        text: "blank-imports: a blank import should be only in a main or test package, or have a comment justifying it"
+      # bad reinvention of the wheel
+      - linters:
+          - gocyclo
+          - cyclop
+          - gocritic
+        path: core/validator/*
+    paths:
+      - docs
+      - logs
+
+issues:
+  fix: false
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - docs
+      - logs

@@ -1,6 +1,7 @@
 package error_handler
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -9,24 +10,22 @@ import (
 	"SimpleChat/backend/settings"
 )
 
-
 // структура кастомной ошибки
 type CustomError struct {
-	Status 		string `json:"status"`
-	StatusCode 	int `json:"statusCode"`
-	Path 		string `json:"path"`
-	Timestamp 	string `json:"timestamp"`
-	Errors 		interface{} `json:"errors"`
+	Status     string      `json:"status"`
+	StatusCode int         `json:"statusCode"`
+	Path       string      `json:"path"`
+	Timestamp  string      `json:"timestamp"`
+	Errors     interface{} `json:"errors"`
 }
 
-
 // возвращает структуру для сериализации с полным описанием ошибки и код ответа
-func GetCustomErrorMessage(path string, err error) (CustomError, int) {
-	// проверка, является ли ошибка err структурой *echo.HTTPError (приведение типов)
-	httpError, ok := err.(*echo.HTTPError)
-	if !ok {
+func GetCustomErrorMessage(path string, err error) (errorMessage CustomError, errorCode int) {
+	var httpError *echo.HTTPError
+	// если ли ошибка err не является структурой *echo.HTTPError
+	if !errors.As(err, &httpError) {
 		httpError = &echo.HTTPError{
-			Code: http.StatusInternalServerError,
+			Code:    http.StatusInternalServerError,
 			Message: map[string]string{"unknown": err.Error()},
 		}
 	}
@@ -40,14 +39,13 @@ func GetCustomErrorMessage(path string, err error) (CustomError, int) {
 	strTime := time.Now().Format(settings.TimeFmt)
 
 	return CustomError{
-		Status: "error",
+		Status:     "error",
 		StatusCode: httpError.Code,
-		Path: path,
-		Timestamp: strTime,
-		Errors: httpError.Message,
+		Path:       path,
+		Timestamp:  strTime,
+		Errors:     httpError.Message,
 	}, httpError.Code
 }
-
 
 // настройка обработчика ошибок
 func CustomErrorHandler(echoApp *echo.Echo) {
@@ -56,17 +54,19 @@ func CustomErrorHandler(echoApp *echo.Echo) {
 
 		// отправка ответа
 		var respErr error
-		if !context.Response().Committed {
-			// если метод HEAD
-			if context.Request().Method == http.MethodHead {
-				respErr = context.NoContent(statusCode)
-			} else {
-				respErr = context.JSON(statusCode, errMessage)
-			}
+		if context.Response().Committed {
+			return
+		}
 
-			if respErr != nil {
-				context.Echo().Logger.Error(respErr)
-			}
+		// если метод HEAD
+		if context.Request().Method == http.MethodHead {
+			respErr = context.NoContent(statusCode)
+		} else {
+			respErr = context.JSON(statusCode, errMessage)
+		}
+		// log if error occurs
+		if respErr != nil {
+			context.Echo().Logger.Error(respErr)
 		}
 	}
 }

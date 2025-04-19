@@ -5,15 +5,15 @@ import (
 
 	echo "github.com/labstack/echo/v4"
 
-	coreValidator "SimpleChat/backend/core/validator"
 	"SimpleChat/backend/app_chat/serializers"
 	"SimpleChat/backend/core/db"
 	"SimpleChat/backend/core/db/models"
 	"SimpleChat/backend/core/services"
+	coreValidator "SimpleChat/backend/core/validator"
 )
 
-
 // эндпоинт для получения id чата для двух юзеров
+//
 //	@Summary		Get chat id
 //	@Description	Get chat id by username of another chat participant in path parameters
 //	@Router			/chat/with/{username} [get]
@@ -35,12 +35,14 @@ func With(context echo.Context) error {
 
 	dbStruct := db.NewDB()
 
-	// парсинг path-параметров 
-	if err = context.Bind(&dataIn); err != nil {
+	// парсинг path-параметров
+	err = context.Bind(&dataIn)
+	if err != nil {
 		return err
 	}
 	// валидация полученной структуры
-	if err = coreValidator.Validate(&dataIn); err != nil {
+	err = coreValidator.Validate(&dataIn)
+	if err != nil {
 		return err
 	}
 	// получение собеседника из БД по path-параметру-логину
@@ -56,7 +58,7 @@ func With(context echo.Context) error {
 	}
 	// если второй юзер является первым
 	if userUUID == secondUserFromDB.ID {
-		return echo.NewHTTPError(400, map[string]string{"chatWith": "another chat participant cannot be the same user"})
+		return echo.NewHTTPError(http.StatusBadRequest, map[string]string{"chatWith": "another chat participant cannot be the same user"})
 	}
 
 	// получение существующего чата для этих двух юзеров или создание нового, если для них ещё нет чата
