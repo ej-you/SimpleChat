@@ -29,7 +29,7 @@ import (
 //	@Produce					json
 //	@SecurityDefinitions.apiKey	CookieAuth
 //	@In							cookie
-//	@Name						auth
+//	@Name						simple-chat-auth
 //	@Description				JWT security token. Cookie is automatic added after auth is done (login/register).
 func main() {
 	echoApp := echo.New()

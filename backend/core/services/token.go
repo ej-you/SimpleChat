@@ -35,7 +35,7 @@ func GetAuthCookie(userID uuid.UUID) (*http.Cookie, error) {
 	}
 	// создание куки авторизации для всех путей api
 	cookie := http.Cookie{
-		Name:     "auth",
+		Name:     "simple-chat-auth",
 		Value:    token,
 		Path:     "/api/",
 		HttpOnly: true,
