@@ -13,7 +13,7 @@ import (
 
 func myUUIDValidator(fieldInfo reflect.StructField, fieldValue googleUUID.UUID, validateTagValues string, errors *validate.Errors) {
 	// имя поля для составления ошибки (выбирает значение из тега json; если такого нет - берёт собственно имя поля)
-	fieldNameForError, isFound := fieldInfo.Tag.Lookup("json")
+	fieldNameForError, isFound := fieldInfo.Tag.Lookup(jsonTag)
 	if !isFound {
 		fieldNameForError = fieldInfo.Name
 	}
@@ -26,7 +26,7 @@ func myUUIDValidator(fieldInfo reflect.StructField, fieldValue googleUUID.UUID, 
 	for _, tagValue := range strings.Split(validateTagValues, "|") {
 		switch {
 		// обязательное поле
-		case tagValue == "required":
+		case tagValue == requiredTag:
 			// валидация средствами библиотеки
 			errors.Append(validate.Validate(
 				&validators.UUIDIsPresent{

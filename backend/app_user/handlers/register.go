@@ -32,11 +32,13 @@ func Register(context echo.Context) error {
 	var newUser models.User
 
 	// парсинг JSON-body
-	if err = context.Bind(&dataIn); err != nil {
+	err = context.Bind(&dataIn)
+	if err != nil {
 		return err
 	}
 	// валидация полученной структуры
-	if err = coreValidator.Validate(&dataIn); err != nil {
+	err = coreValidator.Validate(&dataIn)
+	if err != nil {
 		return err
 	}
 	// создание нового юзера в БД

@@ -15,17 +15,21 @@ import (
 )
 
 // обработка входящих сообщений
-func (c *client) HandleReadMessage(doneChan chan<- int) {
+func (c *client) HandleReadMsg(doneChan chan<- int) {
 	defer c.Conn.Close()
 	defer close(c.Message)
 
 	// настройка таймаута чтения сообщений от клиента
-	c.Conn.SetReadDeadline(time.Now().Add(settings.WebsocketPongWait))
+	err := c.Conn.SetReadDeadline(time.Now().Add(settings.WebsocketPongWait))
+	if err != nil {
+		settings.ErrorLog.Printf("HandleReadMsg: unexpected error when setting read deadline: %v", err)
+		doneChan <- 0
+		return
+	}
 	// настройка обработчика PONG'ов от клиента
 	c.Conn.SetPongHandler(func(string) error {
 		// обновление таймаута после получения PONG сообщения от клиента
-		c.Conn.SetReadDeadline(time.Now().Add(settings.WebsocketPongWait))
-		return nil
+		return c.Conn.SetReadDeadline(time.Now().Add(settings.WebsocketPongWait))
 	})
 
 	for {
@@ -52,7 +56,7 @@ func (c *client) HandleReadMessage(doneChan chan<- int) {
 }
 
 // отправка сообщения
-func (c *client) HandleWriteMessage(doneChan <-chan int) {
+func (c *client) HandleWriteMsg(doneChan <-chan int) {
 	// настройка тикера отправки PING сообщений для проверки активности соединения
 	pongTicker := time.NewTicker(settings.WebsocketPingPeriod)
 
@@ -60,74 +64,36 @@ func (c *client) HandleWriteMessage(doneChan <-chan int) {
 	defer c.Conn.Close()
 	defer c.Remove()
 
-	dbStruct := db.NewDB()
-
 	for {
 		select {
 		// новое сообщение в канале
 		case clientMessage, ok := <-c.Message:
 			// канал закрыт, закрываем соединение
 			if !ok {
-				c.Conn.WriteMessage(websocket.CloseMessage, []byte{})
+				if err := c.Conn.WriteMessage(websocket.CloseMessage, []byte{}); err != nil {
+					settings.ErrorLog.Printf("failed to close connection with user %q: %v\n", c.UserUUID, err)
+					return
+				}
 				settings.InfoLog.Printf("-- Close connection with user %q\n", c.UserUUID)
 				return
 			}
 			// если ошибка, то отправляем её отправителю и пропускаем дальнейшие действия
 			if clientMessage.Error != nil {
 				// если произошла ошибка при отправке, то прерываем соединение
-				if err := c.SendError(clientMessage.Error); err != nil {
+				if err := c.sendError(clientMessage.Error); err != nil {
 					settings.ErrorLog.Printf("failed to send error message: %v\n", err)
 					return
 				}
 				continue
 			}
-
-			// получение uuid другого участника
-			// (и проверка текущего юзера на принадлежность к чату, uuid которого он отправил в сообщении)
-			participantUUID, err := serializers.GetChatParticipantUUID(clientMessage.JSONData.ChatID, c.UserUUID)
-			if err != nil {
-				if err := c.SendError(err); err != nil {
-					settings.ErrorLog.Printf("failed to send error message: %v\n", err)
-					return
-				}
-				continue
-			}
-
-			// добавление записи сообщения в БД
-			var messageFromDB models.Message
-			err = dbStruct.CreateMessage(&messageFromDB, clientMessage.JSONData.ChatID, c.UserUUID, clientMessage.JSONData.Content)
-			if err != nil {
-				if err := c.SendError(err); err != nil {
-					settings.ErrorLog.Printf("failed to send error message: %v\n", err)
-					return
-				}
-				continue
-			}
-
-			// сериализация сообщения
-			byteMessage, err := json.Marshal(messageFromDB)
-			if err != nil {
-				if err := c.SendError(err); err != nil {
-					settings.ErrorLog.Printf("failed to send error message: %v\n", err)
-					return
-				}
-				continue
-			}
-			// отправка сообщения отправителю (всем подключениям юзера с текущим uuid)
-			if err = c.SendMessageToClients(c.UserUUID, byteMessage); err != nil {
-				settings.WarnLog.Printf("close connection with user %q\n", c.UserUUID)
-				return
-			}
-			// поиск второго участника и отправка сообщения ему (если он есть среди подключённых клиентов)
-			c.SendMessageToClients(participantUUID, byteMessage)
-
+			// обработка сообщения
+			c.handleNewMessage(clientMessage.JSONData)
 		// подошло время отправки очередного PING сообщения
 		case <-pongTicker.C:
 			if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
 				settings.WarnLog.Printf("close connection with user %q\n", c.UserUUID)
 				return
 			}
-
 		// из горутины чтения сообщений было послано сообщение о закрытии соединения с юзером
 		case <-doneChan:
 			return
@@ -135,8 +101,53 @@ func (c *client) HandleWriteMessage(doneChan <-chan int) {
 	}
 }
 
+// обработка нового сообщения в канале
+func (c *client) handleNewMessage(messageIn serializers.MessageIn) {
+	// получение uuid другого участника
+	// (и проверка текущего юзера на принадлежность к чату, uuid которого он отправил в сообщении)
+	participantUUID, err := serializers.GetChatParticipantUUID(messageIn.ChatID, c.UserUUID)
+	if err != nil {
+		if err := c.sendError(err); err != nil {
+			settings.ErrorLog.Printf("failed to send error message: %v\n", err)
+			return
+		}
+		return
+	}
+
+	// добавление записи сообщения в БД
+	var messageFromDB models.Message
+	err = db.NewDB().CreateMessage(&messageFromDB, messageIn.ChatID, c.UserUUID, messageIn.Content)
+	if err != nil {
+		if err := c.sendError(err); err != nil {
+			settings.ErrorLog.Printf("failed to send error message: %v\n", err)
+			return
+		}
+		return
+	}
+
+	// сериализация сообщения
+	byteMessage, err := json.Marshal(messageFromDB)
+	if err != nil {
+		if err := c.sendError(err); err != nil {
+			settings.ErrorLog.Printf("failed to send error message: %v\n", err)
+			return
+		}
+		return
+	}
+	// отправка сообщения отправителю (всем подключениям юзера с текущим uuid)
+	if err = c.sendMessageToClients(c.UserUUID, byteMessage); err != nil {
+		settings.WarnLog.Printf("close connection with user %q\n", c.UserUUID)
+		return
+	}
+	// поиск второго участника и отправка сообщения ему (если он есть среди подключённых клиентов)
+	if err = c.sendMessageToClients(participantUUID, byteMessage); err != nil {
+		settings.WarnLog.Printf("error when sending message to participant connections: %v\n", err)
+		return
+	}
+}
+
 // отправка сообщения с ошибкой только текущему подключению юзера
-func (c *client) SendError(errorToSend error) error {
+func (c *client) sendError(errorToSend error) error {
 	// создание структуры ошибки
 	errStruct, _ := coreErrorHandler.GetCustomErrorMessage(settings.WebsocketURLPath, errorToSend)
 	// сериализация структуры ошибки
@@ -144,7 +155,8 @@ func (c *client) SendError(errorToSend error) error {
 	if err != nil {
 		return err
 	}
-	if err = c.Conn.WriteMessage(websocket.TextMessage, byteMessage); err != nil {
+	err = c.Conn.WriteMessage(websocket.TextMessage, byteMessage)
+	if err != nil {
 		return err
 	}
 	settings.InfoLog.Printf("-- Send error message to user %q: %q\n", c.UserUUID, byteMessage)
@@ -152,7 +164,7 @@ func (c *client) SendError(errorToSend error) error {
 }
 
 // отправка сообщения всем подключённым клиентам с uuid отправителя
-func (c *client) SendMessageToClients(userUUID uuid.UUID, byteMessage []byte) error {
+func (c *client) sendMessageToClients(userUUID uuid.UUID, byteMessage []byte) error {
 	var loopErr, sendErr error
 
 	// поиск соединений с юзерами с переданным uuid
@@ -161,17 +173,17 @@ func (c *client) SendMessageToClients(userUUID uuid.UUID, byteMessage []byte) er
 		return nil
 	}
 
-	for _, c := range clientConnections {
-		loopErr = c.Conn.WriteMessage(websocket.TextMessage, byteMessage)
+	for _, clientConn := range clientConnections {
+		loopErr = clientConn.Conn.WriteMessage(websocket.TextMessage, byteMessage)
 		if loopErr != nil {
 			// если ошибка при отправке сообщения текущему клиенту
-			if c.Conn == c.Conn {
+			if clientConn.Conn == c.Conn {
 				sendErr = loopErr
 			}
+			settings.WarnLog.Printf("failed to send message to user %q (from %q)\n", userUUID, clientConn.UserUUID)
 			continue
-			settings.WarnLog.Printf("failed to send message to user %q (from %q)\n", userUUID, c.UserUUID)
 		}
-		settings.InfoLog.Printf("-- Send message to user %q (from %q)\n", userUUID, c.UserUUID)
+		settings.InfoLog.Printf("-- Send message to user %q (from %q)\n", userUUID, clientConn.UserUUID)
 	}
 	if sendErr != nil {
 		return sendErr

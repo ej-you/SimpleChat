@@ -36,11 +36,13 @@ func With(context echo.Context) error {
 	dbStruct := db.NewDB()
 
 	// парсинг path-параметров
-	if err = context.Bind(&dataIn); err != nil {
+	err = context.Bind(&dataIn)
+	if err != nil {
 		return err
 	}
 	// валидация полученной структуры
-	if err = coreValidator.Validate(&dataIn); err != nil {
+	err = coreValidator.Validate(&dataIn)
+	if err != nil {
 		return err
 	}
 	// получение собеседника из БД по path-параметру-логину
@@ -56,7 +58,7 @@ func With(context echo.Context) error {
 	}
 	// если второй юзер является первым
 	if userUUID == secondUserFromDB.ID {
-		return echo.NewHTTPError(400, map[string]string{"chatWith": "another chat participant cannot be the same user"})
+		return echo.NewHTTPError(http.StatusBadRequest, map[string]string{"chatWith": "another chat participant cannot be the same user"})
 	}
 
 	// получение существующего чата для этих двух юзеров или создание нового, если для них ещё нет чата

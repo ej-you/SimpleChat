@@ -26,7 +26,7 @@ var CorsAllowedOrigins []string = strings.Split(os.Getenv("CORS_ALLOWED_ORIGINS"
 var CorsAllowedMethods []string = strings.Split(os.Getenv("CORS_ALLOWED_METHODS"), ",")
 
 // параметры для настройки куки авторизации
-var CookieSecure bool = func() bool {
+var CookieSecure = func() bool {
 	cookieSecureValue := os.Getenv("COOKIES_SECURE")
 	if cookieSecureValue == "true" {
 		return true
@@ -62,10 +62,10 @@ var PathDB = func() string {
 }()
 
 // формат логов
-var LogFmt string = "[${time_rfc3339}] -- ${status} -- from ${remote_ip} to ${host} (${method} ${uri}) [time: ${latency_human}] | ${bytes_in} ${bytes_out} | error: ${error} | -> User-Agent: ${user_agent}\n"
+var LogFmt = "[${time_rfc3339}] -- ${status} -- from ${remote_ip} to ${host} (${method} ${uri}) [time: ${latency_human}] | ${bytes_in} ${bytes_out} | error: ${error} | -> User-Agent: ${user_agent}\n"
 
 // формат времени
-var TimeFmt string = "06-01-02 15:04:05 -07"
+var TimeFmt = "06-01-02 15:04:05 -07"
 
 // логеры
 var InfoLog *log.Logger = log.New(os.Stdout, "[INFO]\t", log.Ldate|log.Ltime)

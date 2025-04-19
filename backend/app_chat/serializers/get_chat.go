@@ -12,4 +12,4 @@ type GetChatIn struct {
 }
 
 // дополнительная валидация входных данных
-func (self *GetChatIn) IsValid(errors *validate.Errors) {}
+func (chat *GetChatIn) IsValid(_ *validate.Errors) {}

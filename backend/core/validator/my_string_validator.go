@@ -12,7 +12,7 @@ import (
 
 func myStringValidator(fieldInfo reflect.StructField, fieldValue string, validateTagValues string, errors *validate.Errors) {
 	// имя поля для составления ошибки (выбирает значение из тега json; если такого нет - берёт собственно имя поля)
-	fieldNameForError, isFound := fieldInfo.Tag.Lookup("json")
+	fieldNameForError, isFound := fieldInfo.Tag.Lookup(jsonTag)
 	if !isFound {
 		fieldNameForError = fieldInfo.Name
 	}
@@ -21,7 +21,7 @@ func myStringValidator(fieldInfo reflect.StructField, fieldValue string, validat
 	for _, tagValue := range strings.Split(validateTagValues, "|") {
 		switch {
 		// обязательное поле
-		case tagValue == "required":
+		case tagValue == requiredTag:
 			// валидация средствами библиотеки
 			errors.Append(validate.Validate(
 				&validators.StringIsPresent{
@@ -43,9 +43,9 @@ func myStringValidator(fieldInfo reflect.StructField, fieldValue string, validat
 			))
 
 		// длина больше чем ... (пример, "min:8")
-		case strings.HasPrefix(tagValue, "min"):
+		case strings.HasPrefix(tagValue, minTag):
 			// парсинг минимальной длины из тега
-			minLenInt, err := strconv.Atoi(strings.TrimPrefix(tagValue, "min:"))
+			minLenInt, err := strconv.Atoi(strings.TrimPrefix(tagValue, minTag+":"))
 			if err != nil {
 				continue
 			}
@@ -55,9 +55,9 @@ func myStringValidator(fieldInfo reflect.StructField, fieldValue string, validat
 			}
 
 		// длина меньше чем ... (пример, "max:100")
-		case strings.HasPrefix(tagValue, "max"):
+		case strings.HasPrefix(tagValue, maxTag):
 			// парсинг максимальной длины из тега
-			maxLenInt, err := strconv.Atoi(strings.TrimPrefix(tagValue, "max:"))
+			maxLenInt, err := strconv.Atoi(strings.TrimPrefix(tagValue, maxTag+":"))
 			if err != nil {
 				continue
 			}

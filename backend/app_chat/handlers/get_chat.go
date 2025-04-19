@@ -33,11 +33,13 @@ func GetChat(context echo.Context) error {
 	var chatFromDB models.Chat
 
 	// парсинг path-параметров
-	if err = context.Bind(&dataIn); err != nil {
+	err = context.Bind(&dataIn)
+	if err != nil {
 		return err
 	}
 	// валидация полученной структуры
-	if err = coreValidator.Validate(&dataIn); err != nil {
+	err = coreValidator.Validate(&dataIn)
+	if err != nil {
 		return err
 	}
 	// получение существующего чата из БД по path-параметру-id
@@ -53,7 +55,7 @@ func GetChat(context echo.Context) error {
 	}
 	// если текущий юзер не состоит в запрашиваемом чате
 	if userUUID != chatFromDB.Users[0].ID && userUUID != chatFromDB.Users[1].ID {
-		return echo.NewHTTPError(403, map[string]string{"getChat": "forbidden"})
+		return echo.NewHTTPError(http.StatusForbidden, map[string]string{"getChat": "forbidden"})
 	}
 
 	return context.JSON(http.StatusOK, chatFromDB)

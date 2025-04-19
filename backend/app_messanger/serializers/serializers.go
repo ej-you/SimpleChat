@@ -2,6 +2,7 @@ package serializers
 
 import (
 	"encoding/json"
+	"net/http"
 
 	validate "github.com/gobuffalo/validate/v3"
 	"github.com/google/uuid"
@@ -19,7 +20,7 @@ type GetChatIn struct {
 }
 
 // дополнительная валидация входных данных
-func (chat *GetChatIn) IsValid(errors *validate.Errors) {}
+func (chat *GetChatIn) IsValid(_ *validate.Errors) {}
 
 // входные данные отправки сообщения через WebSocket
 type MessageIn struct {
@@ -28,17 +29,18 @@ type MessageIn struct {
 }
 
 // дополнительная валидация входных данных
-func (mes *MessageIn) IsValid(errors *validate.Errors) {}
+func (mes *MessageIn) IsValid(_ *validate.Errors) {}
 
 // десериализация сырого сообщения в структуру и её валидация
 func (mes *MessageIn) ParseAndValidate(rowMessage []byte) error {
 	// десериализация сообщения
 	err := json.Unmarshal(rowMessage, mes)
 	if err != nil {
-		return echo.NewHTTPError(400, map[string]string{"message": "failed to parse JSON from message: " + err.Error()})
+		return echo.NewHTTPError(http.StatusBadRequest, map[string]string{"message": "failed to parse JSON from message: " + err.Error()})
 	}
 	// валидация сообщения
-	if err = coreValidator.Validate(mes); err != nil {
+	err = coreValidator.Validate(mes)
+	if err != nil {
 		return err
 	}
 	return nil
@@ -54,12 +56,11 @@ func GetChatParticipantUUID(chatUUID, firstParticipantUUID uuid.UUID) (uuid.UUID
 
 	// если первый юзер не является участником этого чата, то возвращаем ошибку
 	if firstParticipantUUID != chat.Users[0].ID && firstParticipantUUID != chat.Users[1].ID {
-		return uuid.UUID{}, echo.NewHTTPError(403, map[string]string{"message": "forbidden"})
+		return uuid.UUID{}, echo.NewHTTPError(http.StatusForbidden, map[string]string{"message": "forbidden"})
 	}
 
 	if chat.Users[0].ID == firstParticipantUUID {
 		return chat.Users[1].ID, nil
-	} else {
-		return chat.Users[0].ID, nil
 	}
+	return chat.Users[0].ID, nil
 }

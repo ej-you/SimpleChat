@@ -9,7 +9,7 @@ import (
 )
 
 // подгрузка urls каждого микроприложения и их общая настройка
-func InitUrlRouters(echoApp *echo.Echo) {
+func InitURLRouters(echoApp *echo.Echo) {
 	apiUserGroup := echoApp.Group("/api/user")
 	userUrls.RouterGroup(apiUserGroup)
 

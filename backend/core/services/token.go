@@ -20,7 +20,7 @@ func getToken(userID uuid.UUID) (string, error) {
 
 	tokenString, err := tokenStruct.SignedString([]byte(settings.SecretForJWT))
 	if err != nil {
-		return "", echo.NewHTTPError(500, map[string]string{"obtainToken": err.Error()})
+		return "", echo.NewHTTPError(http.StatusInternalServerError, map[string]string{"obtainToken": err.Error()})
 	}
 
 	return tokenString, nil

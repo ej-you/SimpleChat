@@ -1,6 +1,8 @@
 package services
 
 import (
+	"net/http"
+
 	jwt "github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	echo "github.com/labstack/echo/v4"
@@ -12,7 +14,7 @@ func EncodePassword(password string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		// возвращаем 400, потому что скорее всего ошибка длины пароля
-		return "", echo.NewHTTPError(400, map[string]string{"encodePassword": err.Error()})
+		return "", echo.NewHTTPError(http.StatusBadRequest, map[string]string{"encodePassword": err.Error()})
 	}
 	return string(hash), nil
 }
@@ -28,7 +30,10 @@ func GetUserIDFromRequest(context echo.Context) (uuid.UUID, error) {
 	var contextUserID uuid.UUID
 
 	// ошибка, которую возвратит функция при неудаче
-	getTokenUserIDError := echo.NewHTTPError(400, map[string]string{"parseToken": "failed to get user id from token"})
+	getTokenUserIDError := echo.NewHTTPError(
+		http.StatusBadRequest,
+		map[string]string{"parseToken": "failed to get user id from token"},
+	)
 
 	// достаём map значений JWT-токена из контекста context
 	token, ok := context.Get("user").(*jwt.Token)
@@ -48,7 +53,10 @@ func GetUserIDFromRequest(context echo.Context) (uuid.UUID, error) {
 	// парсинг строки с uuid в объект uuid.UUID
 	contextUserID, err := uuid.Parse(stringContextUserID)
 	if err != nil {
-		return contextUserID, echo.NewHTTPError(500, map[string]string{"parseToken": "failed to parse uuid from string"})
+		return contextUserID, echo.NewHTTPError(
+			http.StatusInternalServerError,
+			map[string]string{"parseToken": "failed to parse uuid from string"},
+		)
 	}
 
 	return contextUserID, nil

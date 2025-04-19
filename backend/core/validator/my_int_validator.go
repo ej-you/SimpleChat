@@ -12,7 +12,7 @@ import (
 
 func myIntValidator(fieldInfo reflect.StructField, fieldValue int64, validateTagValues string, errors *validate.Errors) {
 	// имя поля для составления ошибки (выбирает значение из тега json; если такого нет - берёт собственно имя поля)
-	fieldNameForError, isFound := fieldInfo.Tag.Lookup("json")
+	fieldNameForError, isFound := fieldInfo.Tag.Lookup(jsonTag)
 	if !isFound {
 		fieldNameForError = fieldInfo.Name
 	}
@@ -21,7 +21,7 @@ func myIntValidator(fieldInfo reflect.StructField, fieldValue int64, validateTag
 	for _, tagValue := range strings.Split(validateTagValues, "|") {
 		switch {
 		// обязательное поле
-		case tagValue == "required":
+		case tagValue == requiredTag:
 			// валидация средствами библиотеки
 			errors.Append(validate.Validate(
 				&validators.IntIsPresent{
@@ -32,9 +32,9 @@ func myIntValidator(fieldInfo reflect.StructField, fieldValue int64, validateTag
 			))
 
 		// число (int) больше чем ... (пример, "min:8")
-		case strings.HasPrefix(tagValue, "min"):
+		case strings.HasPrefix(tagValue, minTag):
 			// парсинг минимального значения из тега (в int64)
-			minInt, err := strconv.ParseInt(strings.TrimPrefix(tagValue, "min:"), 10, 64)
+			minInt, err := strconv.ParseInt(strings.TrimPrefix(tagValue, minTag+":"), 10, 64)
 			if err != nil {
 				continue
 			}
@@ -44,9 +44,9 @@ func myIntValidator(fieldInfo reflect.StructField, fieldValue int64, validateTag
 			}
 
 		// число (int) меньше чем ... (пример, "max:100")
-		case strings.HasPrefix(tagValue, "max"):
+		case strings.HasPrefix(tagValue, maxTag):
 			// парсинг максимального значения из тега (в int64)
-			maxInt, err := strconv.ParseInt(strings.TrimPrefix(tagValue, "max:"), 10, 64)
+			maxInt, err := strconv.ParseInt(strings.TrimPrefix(tagValue, maxTag+":"), 10, 64)
 			if err != nil {
 				continue
 			}

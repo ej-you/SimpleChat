@@ -13,4 +13,4 @@ type LoginUserIn struct {
 }
 
 // дополнительная валидация входных данных
-func (self *LoginUserIn) IsValid(errors *validate.Errors) {}
+func (user *LoginUserIn) IsValid(_ *validate.Errors) {}

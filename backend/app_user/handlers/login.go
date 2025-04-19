@@ -33,11 +33,13 @@ func Login(context echo.Context) error {
 	var userFromDB models.User
 
 	// парсинг JSON-body
-	if err = context.Bind(&dataIn); err != nil {
+	err = context.Bind(&dataIn)
+	if err != nil {
 		return err
 	}
 	// валидация полученной структуры
-	if err = coreValidator.Validate(&dataIn); err != nil {
+	err = coreValidator.Validate(&dataIn)
+	if err != nil {
 		return err
 	}
 	// получение юзера из БД по username'у
@@ -47,7 +49,7 @@ func Login(context echo.Context) error {
 	}
 	// проверка на совпадение введённого пароля и хэша из БД
 	if ok := services.PasswordIsCorrect(dataIn.Password, userFromDB.Password); !ok {
-		return echo.NewHTTPError(401, map[string]string{"password": "invalid password"})
+		return echo.NewHTTPError(http.StatusUnauthorized, map[string]string{"password": "invalid password"})
 	}
 	// получение куки авторизации
 	var newAuthCookie *http.Cookie

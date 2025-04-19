@@ -41,23 +41,23 @@ func newClientsMap() *clientsMap {
 var clients = newClientsMap()
 
 // добавление клиента в словарь
-func (this client) Add() {
+func (c client) Add() {
 	// если список с подключениями данного клиента уже есть, добавляем в него новое подключение
-	if _, found := clients.ClientsMap[this.UserUUID]; found {
+	if _, found := clients.ClientsMap[c.UserUUID]; found {
 		clients.Lock.RLock()
-		clients.ClientsMap[this.UserUUID] = append(clients.ClientsMap[this.UserUUID], this)
+		clients.ClientsMap[c.UserUUID] = append(clients.ClientsMap[c.UserUUID], c)
 		clients.Lock.RUnlock()
 		// если списка с подключениями данного клиента нет, то создаём его с текущим подключением
 	} else {
 		clients.Lock.RLock()
-		clients.ClientsMap[this.UserUUID] = []client{this}
+		clients.ClientsMap[c.UserUUID] = []client{c}
 		clients.Lock.RUnlock()
 	}
 }
 
 // удаление клиента из словаря
-func (this client) Remove() {
-	clientConnections, found := clients.ClientsMap[this.UserUUID]
+func (c client) Remove() {
+	clientConnections, found := clients.ClientsMap[c.UserUUID]
 	// если списка с подключениями данного клиента нет
 	if !found {
 		return
@@ -66,15 +66,15 @@ func (this client) Remove() {
 	// если список с подключениями данного клиента содержит один элемент, то удаляем этот список из словаря
 	if len(clientConnections) == 1 {
 		clients.Lock.RLock()
-		delete(clients.ClientsMap, this.UserUUID)
+		delete(clients.ClientsMap, c.UserUUID)
 		clients.Lock.RUnlock()
 		// если список с подключениями данного клиента содержит несколько элементов, то удаляем элемент текущего подключения из этого списка
 	} else {
 		clientIndex := slices.IndexFunc(clientConnections, func(elem client) bool {
-			return elem.Conn == this.Conn
+			return elem.Conn == c.Conn
 		})
 		clients.Lock.RLock()
-		clients.ClientsMap[this.UserUUID] = slices.Delete(clientConnections, clientIndex, clientIndex+1)
+		clients.ClientsMap[c.UserUUID] = slices.Delete(clientConnections, clientIndex, clientIndex+1)
 		clients.Lock.RUnlock()
 	}
 }

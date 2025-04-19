@@ -3,18 +3,16 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
 
 	echo "github.com/labstack/echo/v4"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
-
-	_ "SimpleChat/backend/docs"
 	echoSwagger "github.com/swaggo/echo-swagger"
 
-	coreErrorHandler "SimpleChat/backend/core/error_handler"
-	coreUrls "SimpleChat/backend/core/urls"
+	_ "SimpleChat/backend/docs"
 
 	"SimpleChat/backend/core/db"
+	coreErrorHandler "SimpleChat/backend/core/error_handler"
+	coreUrls "SimpleChat/backend/core/urls"
 	"SimpleChat/backend/settings"
 )
 
@@ -77,13 +75,13 @@ func main() {
 			return false
 		},
 		ErrorMessage: "timeout error",
-		Timeout:      20 * time.Second,
+		Timeout:      settings.TimeoutForTimeoutMiddleware,
 	}))
 
 	// настройка кастомного обработчика ошибок
 	coreErrorHandler.CustomErrorHandler(echoApp)
 	// настройка роутеров для эндпоинтов
-	coreUrls.InitUrlRouters(echoApp)
+	coreUrls.InitURLRouters(echoApp)
 
 	// настройка Swagger документации
 	echoApp.GET("/api/swagger/*", echoSwagger.WrapHandler)

@@ -13,4 +13,4 @@ type RegisterUserIn struct {
 }
 
 // дополнительная валидация входных данных
-func (self *RegisterUserIn) IsValid(errors *validate.Errors) {}
+func (user *RegisterUserIn) IsValid(_ *validate.Errors) {}

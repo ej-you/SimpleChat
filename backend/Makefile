@@ -8,6 +8,9 @@ dest = ./go_app
 dev:
 	go run $(source)
 
+lint:
+	golangci-lint run -c ./.golangci.yml ./...
+
 migrate:
 	go run $(source) migrate
 

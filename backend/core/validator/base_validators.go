@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"net/http"
 	"reflect"
 	"strings"
 
@@ -9,8 +10,15 @@ import (
 	echo "github.com/labstack/echo/v4"
 )
 
+const (
+	requiredTag = "required"
+	jsonTag     = "json"
+	minTag      = "min"
+	maxTag      = "max"
+)
+
 // объединение *validate.Errors в одну ошибку *echo.HTTPError
-func collectHttpError(validateErrors *validate.Errors) error {
+func collectHTTPError(validateErrors *validate.Errors) error {
 	if len(validateErrors.Errors) > 0 {
 		// словарь для ошибок
 		errMap := make(map[string]string, len(validateErrors.Errors))
@@ -19,7 +27,7 @@ func collectHttpError(validateErrors *validate.Errors) error {
 			errMap[key] = value[0]
 		}
 		// возвращаем *echo.HTTPError
-		httpError := echo.NewHTTPError(400, errMap)
+		httpError := echo.NewHTTPError(http.StatusBadRequest, errMap)
 		return httpError
 	}
 	return nil
@@ -33,14 +41,14 @@ func Validate(dataToValidate validate.Validator) error {
 	// базовая валидация входных данных по тегам структуры
 	baseValidator(dataToValidate, validateErrors)
 	// если базовая валидация не прошла, то возвращаем ошибку
-	if err := collectHttpError(validateErrors); err != nil {
+	if err := collectHTTPError(validateErrors); err != nil {
 		return err
 	}
 
 	// дополнительная валидация входных данных (в методе IsValid у структуры)
 	validateErrors = validate.Validate(dataToValidate)
 	// если дополнительная валидация не прошла, то возвращаем ошибку
-	if err := collectHttpError(validateErrors); err != nil {
+	if err := collectHTTPError(validateErrors); err != nil {
 		return err
 	}
 	return nil
