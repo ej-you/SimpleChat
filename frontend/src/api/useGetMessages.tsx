@@ -13,7 +13,7 @@ const useGetMessages = () => {
 	const getMessages = async () => {
     setErrorContent('')
     try{
-      const res = await axios.get(`https://150.241.82.68/api/chat/${id}`, {withCredentials: true,})
+      const res = await axios.get(`http://backend:8000/api/chat/${id}`, {withCredentials: true,})
       setChatData(res.data)
     } catch(err) {
       handleError(err)

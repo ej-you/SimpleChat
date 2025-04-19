@@ -19,21 +19,21 @@ const Footer: React.FC= () => {
 			content: ''
 		}
 	})
-	
+
 	// определение устройства
 	const isMobileDevice = () => {
 		return /Mobi|Android/i.test(navigator.userAgent)
 	}
 
 	// Получение сообщений
-	
+
 	useEffect(() => {
-		webSocket.current = new WebSocket('https://150.241.82.68/api/messanger')
-		
+		webSocket.current = new WebSocket('http://backend:8000/api/messanger')
+
 		webSocket.current.onopen = () => console.log("WebSocket opened")
 		webSocket.current.onclose = () => console.log("WebSocket closed")
 		webSocket.current.onerror = (error) => console.error("WebSocket error", error)
-	
+
 		webSocket.current.onmessage = (e) => {
 			const data = JSON.parse(e.data)
 			console.log(data)
