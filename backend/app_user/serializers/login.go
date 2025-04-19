@@ -7,9 +7,9 @@ import (
 // @Description входные данные для входа юзера
 type LoginUserIn struct {
 	// логин юзера
-	Username 	string `json:"username" myvalid:"required" example:"vasya_2007"`
+	Username string `json:"username" myvalid:"required" example:"vasya_2007"`
 	// пароль юзера
-	Password 	string `json:"password" myvalid:"required" example:"qwerty123"`
+	Password string `json:"password" myvalid:"required" example:"qwerty123"`
 }
 
 // дополнительная валидация входных данных

@@ -4,19 +4,18 @@ import (
 	"net/http"
 	"time"
 
-	echo "github.com/labstack/echo/v4"
 	jwt "github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	echo "github.com/labstack/echo/v4"
 
 	"SimpleChat/backend/settings"
 )
-
 
 // создание токена для юзера
 func getToken(userID uuid.UUID) (string, error) {
 	tokenStruct := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"userID": userID,
-		"exp": time.Now().Add(settings.TokenExpiredTime).Unix(),
+		"exp":    time.Now().Add(settings.TokenExpiredTime).Unix(),
 	})
 
 	tokenString, err := tokenStruct.SignedString([]byte(settings.SecretForJWT))
@@ -27,7 +26,6 @@ func getToken(userID uuid.UUID) (string, error) {
 	return tokenString, nil
 }
 
-
 // создание куки авторизации для юзера
 func GetAuthCookie(userID uuid.UUID) (*http.Cookie, error) {
 	// получение токена для юзера
@@ -37,13 +35,13 @@ func GetAuthCookie(userID uuid.UUID) (*http.Cookie, error) {
 	}
 	// создание куки авторизации для всех путей api
 	cookie := http.Cookie{
-		Name: "auth",
-		Value: token,
-		Path: "/api/",
+		Name:     "auth",
+		Value:    token,
+		Path:     "/api/",
 		HttpOnly: true,
-		Secure: settings.CookieSecure,
+		Secure:   settings.CookieSecure,
 		SameSite: http.SameSiteNoneMode,
-		Expires: time.Now().Add(settings.TokenExpiredTime),
+		Expires:  time.Now().Add(settings.TokenExpiredTime),
 	}
 
 	return &cookie, nil

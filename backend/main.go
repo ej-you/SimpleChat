@@ -8,8 +8,8 @@ import (
 	echo "github.com/labstack/echo/v4"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
 
-	echoSwagger "github.com/swaggo/echo-swagger"
 	_ "SimpleChat/backend/docs"
+	echoSwagger "github.com/swaggo/echo-swagger"
 
 	coreErrorHandler "SimpleChat/backend/core/error_handler"
 	coreUrls "SimpleChat/backend/core/urls"
@@ -18,8 +18,8 @@ import (
 	"SimpleChat/backend/settings"
 )
 
-
 // Настройка Swagger документации
+//
 //	@Title						SimpleChat Go API
 //	@Version					1.0
 //	@Description				This is a SimpleChat API written on Golang using Echo and Gorilla WebSocket.
@@ -43,7 +43,7 @@ func main() {
 		// запуск в dev режиме
 		if args[1] == "dev" {
 			echoApp.Debug = true
-		// проведение миграций БД без запуска самого приложения
+			// проведение миграций БД без запуска самого приложения
 		} else if args[1] == "migrate" {
 			db.Migrate()
 			return
@@ -61,15 +61,15 @@ func main() {
 
 	// настройка CORS
 	echoApp.Use(echoMiddleware.CORSWithConfig(echoMiddleware.CORSConfig{
-		AllowOrigins: settings.CorsAllowedOrigins,
-		AllowMethods: settings.CorsAllowedMethods,
-		AllowHeaders: []string{"Content-Type", "Authorization", "Upgrade", "Sec-WebSocket-Protocol", "Sec-WebSocket-Key", "Sec-WebSocket-Version"},
+		AllowOrigins:     settings.CorsAllowedOrigins,
+		AllowMethods:     settings.CorsAllowedMethods,
+		AllowHeaders:     []string{"Content-Type", "Authorization", "Upgrade", "Sec-WebSocket-Protocol", "Sec-WebSocket-Key", "Sec-WebSocket-Version"},
 		AllowCredentials: true,
 	}))
 
 	// настройка таймаута для всех HTTP запросов на 20 секунд
 	echoApp.Use(echoMiddleware.TimeoutWithConfig(echoMiddleware.TimeoutConfig{
-		// пропускаем использование этого middleware для WebSocket соединения 
+		// пропускаем использование этого middleware для WebSocket соединения
 		Skipper: func(context echo.Context) bool {
 			if context.Request().URL.Path == settings.WebsocketURLPath {
 				return true
@@ -77,7 +77,7 @@ func main() {
 			return false
 		},
 		ErrorMessage: "timeout error",
-		Timeout: 20*time.Second,
+		Timeout:      20 * time.Second,
 	}))
 
 	// настройка кастомного обработчика ошибок

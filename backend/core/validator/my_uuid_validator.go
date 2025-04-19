@@ -7,10 +7,9 @@ import (
 
 	validate "github.com/gobuffalo/validate/v3"
 	"github.com/gobuffalo/validate/v3/validators"
-    googleUUID "github.com/google/uuid"
-    gofrsUUID "github.com/gofrs/uuid"
+	gofrsUUID "github.com/gofrs/uuid"
+	googleUUID "github.com/google/uuid"
 )
-
 
 func myUUIDValidator(fieldInfo reflect.StructField, fieldValue googleUUID.UUID, validateTagValues string, errors *validate.Errors) {
 	// имя поля для составления ошибки (выбирает значение из тега json; если такого нет - берёт собственно имя поля)
@@ -26,16 +25,16 @@ func myUUIDValidator(fieldInfo reflect.StructField, fieldValue googleUUID.UUID, 
 	// перебираем значения тега validateTagValues
 	for _, tagValue := range strings.Split(validateTagValues, "|") {
 		switch {
-			// обязательное поле
-			case tagValue == "required":
-				// валидация средствами библиотеки
-				errors.Append(validate.Validate(
-					&validators.UUIDIsPresent{
-						Name: fieldInfo.Name, // название поля
-						Field: fieldValueGofrsUUID , // значение поля
-						Message: fmt.Sprintf("%s field must not be blank", fieldNameForError),
-					},
-				))
+		// обязательное поле
+		case tagValue == "required":
+			// валидация средствами библиотеки
+			errors.Append(validate.Validate(
+				&validators.UUIDIsPresent{
+					Name:    fieldInfo.Name,      // название поля
+					Field:   fieldValueGofrsUUID, // значение поля
+					Message: fmt.Sprintf("%s field must not be blank", fieldNameForError),
+				},
+			))
 		}
 	}
 }

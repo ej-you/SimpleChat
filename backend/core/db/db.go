@@ -3,25 +3,24 @@ package db
 import (
 	"strings"
 
+	"github.com/google/uuid"
 	echo "github.com/labstack/echo/v4"
 	"gorm.io/gorm"
-	"github.com/google/uuid"
 
 	"SimpleChat/backend/core/db/models"
 	"SimpleChat/backend/core/services"
 )
 
-
 // структура для запросов к БД
 type DB struct {
 	dbConnect *gorm.DB
 }
+
 func NewDB() *DB {
 	return &DB{
 		dbConnect: dbConnection,
 	}
 }
-
 
 // создание нового юзера
 func (db *DB) CreateUser(user *models.User, username, password string) error {
@@ -78,7 +77,6 @@ func (db *DB) GetUserByUsername(user *models.User, username string) error {
 	return nil
 }
 
-
 // получение чата (с подгрузкой его участников и сообщений) по его ID
 func (db *DB) GetFullChatByID(chat *models.Chat, id uuid.UUID) error {
 	selectResult := db.dbConnect.Preload("Users").Preload(
@@ -130,8 +128,8 @@ func (db *DB) createChat(chat *models.Chat, firstUserFromDB, secondUserFromDB mo
 	return nil
 }
 
-// получение чата или создание нового, если такого ещё нет 
-func (db *DB)  GetOrCreateChat(chat *models.Chat, firstUserID, secondUserID uuid.UUID) error {
+// получение чата или создание нового, если такого ещё нет
+func (db *DB) GetOrCreateChat(chat *models.Chat, firstUserID, secondUserID uuid.UUID) error {
 	var firstUserFromDB, secondUserFromDB models.User
 
 	// получение чатов первого юзера
@@ -147,13 +145,13 @@ func (db *DB)  GetOrCreateChat(chat *models.Chat, firstUserID, secondUserID uuid
 
 	// совместные чаты юзеров (в контексте этого проекта он должен быть один)
 	joinChats := services.IntersectUserChats(firstUserFromDB.Chats, secondUserFromDB.Chats)
-	
+
 	var err error
 	// если пересечение не было найдено, то создаём новый чат
 	if len(joinChats) == 0 {
 		err = db.createChat(chat, firstUserFromDB, secondUserFromDB)
 		return err
-	// если пересечение было найдено, то возвращаем чат (только его id без подгрузки участников и сообщений)
+		// если пересечение было найдено, то возвращаем чат (только его id без подгрузки участников и сообщений)
 	} else {
 		(*chat) = joinChats[0]
 		return err
@@ -161,7 +159,6 @@ func (db *DB)  GetOrCreateChat(chat *models.Chat, firstUserID, secondUserID uuid
 
 	return nil
 }
-
 
 // создание нового сообщения
 func (db *DB) CreateMessage(message *models.Message, chatID, senderID uuid.UUID, content string) error {
@@ -186,6 +183,6 @@ func (db *DB) CreateMessage(message *models.Message, chatID, senderID uuid.UUID,
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }

@@ -4,11 +4,10 @@ import (
 	"reflect"
 	"strings"
 
-	echo "github.com/labstack/echo/v4"
 	validate "github.com/gobuffalo/validate/v3"
-    "github.com/google/uuid"
+	"github.com/google/uuid"
+	echo "github.com/labstack/echo/v4"
 )
-
 
 // объединение *validate.Errors в одну ошибку *echo.HTTPError
 func collectHttpError(validateErrors *validate.Errors) error {
@@ -25,7 +24,6 @@ func collectHttpError(validateErrors *validate.Errors) error {
 	}
 	return nil
 }
-
 
 // возврат ошибок валидации
 // принимает интерфейс валидируемыемых структур с входными данными (у которых есть метод IsValid(errors *validate.Errors))
@@ -48,7 +46,6 @@ func Validate(dataToValidate validate.Validator) error {
 	return nil
 }
 
-
 // базовая валидация структуры по тегам
 func baseValidator(givenStruct validate.Validator, errors *validate.Errors) {
 	// Получаем значение структуры (с разыменовыванием поинтера через Elem())
@@ -66,7 +63,7 @@ func baseValidator(givenStruct validate.Validator, errors *validate.Errors) {
 	var isFound bool
 
 	// перебираем все поля структуры и проверяем теги каждого поля
-	for i:=0; i < structValue.NumField(); i++ {
+	for i := 0; i < structValue.NumField(); i++ {
 		fieldInfo = structValue.Type().Field(i)
 		fieldValue = structValue.Field(i)
 		fieldType = fieldInfo.Type.String()
@@ -75,26 +72,26 @@ func baseValidator(givenStruct validate.Validator, errors *validate.Errors) {
 		if isFound {
 			// перебор доступных для валидации типов полей структуры
 			switch {
-				// строка
-				case fieldType == "string":
-					// валидация для поля структуры строкового типа
-					myStringValidator(fieldInfo, fieldValue.String(), myvalidTag, errors)
+			// строка
+			case fieldType == "string":
+				// валидация для поля структуры строкового типа
+				myStringValidator(fieldInfo, fieldValue.String(), myvalidTag, errors)
 
-				// целое число
-				case strings.HasPrefix(fieldType, "int"):
-					// валидация для поля структуры целочислленного типа
-					myIntValidator(fieldInfo, fieldValue.Int(), myvalidTag, errors)
-				
-				// вещественное число
-				case strings.HasPrefix(fieldType, "float"):
-					// валидация для поля структуры вещественного типа
-					myFloatValidator(fieldInfo, fieldValue.Float(), myvalidTag, errors)
-				
-				// uuid
-				case fieldType == "uuid.UUID":
-					// валидация для поля структуры типа uuid
-					myUUIDValidator(fieldInfo, fieldValue.Interface().(uuid.UUID), myvalidTag, errors)
+			// целое число
+			case strings.HasPrefix(fieldType, "int"):
+				// валидация для поля структуры целочислленного типа
+				myIntValidator(fieldInfo, fieldValue.Int(), myvalidTag, errors)
+
+			// вещественное число
+			case strings.HasPrefix(fieldType, "float"):
+				// валидация для поля структуры вещественного типа
+				myFloatValidator(fieldInfo, fieldValue.Float(), myvalidTag, errors)
+
+			// uuid
+			case fieldType == "uuid.UUID":
+				// валидация для поля структуры типа uuid
+				myUUIDValidator(fieldInfo, fieldValue.Interface().(uuid.UUID), myvalidTag, errors)
 			}
-		}		
+		}
 	}
 }

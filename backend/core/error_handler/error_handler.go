@@ -9,16 +9,14 @@ import (
 	"SimpleChat/backend/settings"
 )
 
-
 // структура кастомной ошибки
 type CustomError struct {
-	Status 		string `json:"status"`
-	StatusCode 	int `json:"statusCode"`
-	Path 		string `json:"path"`
-	Timestamp 	string `json:"timestamp"`
-	Errors 		interface{} `json:"errors"`
+	Status     string      `json:"status"`
+	StatusCode int         `json:"statusCode"`
+	Path       string      `json:"path"`
+	Timestamp  string      `json:"timestamp"`
+	Errors     interface{} `json:"errors"`
 }
-
 
 // возвращает структуру для сериализации с полным описанием ошибки и код ответа
 func GetCustomErrorMessage(path string, err error) (CustomError, int) {
@@ -26,7 +24,7 @@ func GetCustomErrorMessage(path string, err error) (CustomError, int) {
 	httpError, ok := err.(*echo.HTTPError)
 	if !ok {
 		httpError = &echo.HTTPError{
-			Code: http.StatusInternalServerError,
+			Code:    http.StatusInternalServerError,
 			Message: map[string]string{"unknown": err.Error()},
 		}
 	}
@@ -40,14 +38,13 @@ func GetCustomErrorMessage(path string, err error) (CustomError, int) {
 	strTime := time.Now().Format(settings.TimeFmt)
 
 	return CustomError{
-		Status: "error",
+		Status:     "error",
 		StatusCode: httpError.Code,
-		Path: path,
-		Timestamp: strTime,
-		Errors: httpError.Message,
+		Path:       path,
+		Timestamp:  strTime,
+		Errors:     httpError.Message,
 	}, httpError.Code
 }
-
 
 // настройка обработчика ошибок
 func CustomErrorHandler(echoApp *echo.Echo) {

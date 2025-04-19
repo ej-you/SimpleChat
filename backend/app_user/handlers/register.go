@@ -5,15 +5,15 @@ import (
 
 	echo "github.com/labstack/echo/v4"
 
-	coreValidator "SimpleChat/backend/core/validator"
 	"SimpleChat/backend/app_user/serializers"
 	"SimpleChat/backend/core/db"
 	"SimpleChat/backend/core/db/models"
 	"SimpleChat/backend/core/services"
+	coreValidator "SimpleChat/backend/core/validator"
 )
 
-
 // эндпоинт для регистрации юзера
+//
 //	@Summary		Register user
 //	@Description	Register new user with form
 //	@Router			/user/register [post]

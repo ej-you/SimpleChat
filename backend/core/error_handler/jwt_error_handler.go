@@ -3,10 +3,9 @@ package error_handler
 import (
 	"net/http"
 
-	echo "github.com/labstack/echo/v4"
 	echojwt "github.com/labstack/echo-jwt/v4"
+	echo "github.com/labstack/echo/v4"
 )
-
 
 // настройка обработчика ошибок для JWT middleware
 func CustomJWTErrorHandler(context echo.Context, err error) error {
@@ -14,7 +13,7 @@ func CustomJWTErrorHandler(context echo.Context, err error) error {
 	tokenParsingError, ok := err.(*echojwt.TokenParsingError)
 	if ok {
 		httpError := &echo.HTTPError{
-			Code: http.StatusUnauthorized,
+			Code:    http.StatusUnauthorized,
 			Message: map[string]string{"token": tokenParsingError.Error()},
 		}
 		return httpError
@@ -24,7 +23,7 @@ func CustomJWTErrorHandler(context echo.Context, err error) error {
 	_, ok = err.(*echojwt.TokenExtractionError)
 	if ok {
 		httpError := &echo.HTTPError{
-			Code: http.StatusUnauthorized,
+			Code:    http.StatusUnauthorized,
 			Message: map[string]string{"token": "missing auth cookie"},
 		}
 		return httpError

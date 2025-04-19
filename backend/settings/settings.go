@@ -1,8 +1,8 @@
 package settings
 
 import (
-	"net/http"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -10,10 +10,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
-
 // загрузка переменных окружения
 var _ error = godotenv.Load("./.env")
-
 
 // распаковка переменных окружения
 var Port string = os.Getenv("GO_PORT")
@@ -26,6 +24,7 @@ const WebsocketPingPeriod = WebsocketPongWait * 9 / 10
 // настройки CORS
 var CorsAllowedOrigins []string = strings.Split(os.Getenv("CORS_ALLOWED_ORIGINS"), ",")
 var CorsAllowedMethods []string = strings.Split(os.Getenv("CORS_ALLOWED_METHODS"), ",")
+
 // параметры для настройки куки авторизации
 var CookieSecure bool = func() bool {
 	cookieSecureValue := os.Getenv("COOKIES_SECURE")
@@ -38,14 +37,14 @@ var CookieSameSite http.SameSite = func() http.SameSite {
 	sameSiteValue := os.Getenv("COOKIES_SAME_SITE")
 
 	switch sameSiteValue {
-		case "LaxMode":
-			return http.SameSiteLaxMode
-		case "StrictMode":
-			return http.SameSiteStrictMode
-		case "NoneMode":
-			return http.SameSiteNoneMode
-		default:
-			return http.SameSiteDefaultMode
+	case "LaxMode":
+		return http.SameSiteLaxMode
+	case "StrictMode":
+		return http.SameSiteStrictMode
+	case "NoneMode":
+		return http.SameSiteNoneMode
+	default:
+		return http.SameSiteDefaultMode
 	}
 }()
 
@@ -64,6 +63,7 @@ var PathDB = func() string {
 
 // формат логов
 var LogFmt string = "[${time_rfc3339}] -- ${status} -- from ${remote_ip} to ${host} (${method} ${uri}) [time: ${latency_human}] | ${bytes_in} ${bytes_out} | error: ${error} | -> User-Agent: ${user_agent}\n"
+
 // формат времени
 var TimeFmt string = "06-01-02 15:04:05 -07"
 
