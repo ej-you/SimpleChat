@@ -18,7 +18,7 @@ RUN npm run build
 # nginx
 # -----
 
-FROM nginx:stable-alpine3.20-perl
+FROM nginx:stable-alpine3.20-perl AS nginx
 
 WORKDIR /app/frontend
 

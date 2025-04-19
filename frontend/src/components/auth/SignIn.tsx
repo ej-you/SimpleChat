@@ -2,7 +2,7 @@ import AuthApi from '../../api/AuthApi'
 
 const SignIn = () => {
 	return (
-		<AuthApi apiUrl='http://backend:8000/api/user/login'/>
+		<AuthApi apiUrl='https://web-server/api/user/login'/>
 	)
 }
 

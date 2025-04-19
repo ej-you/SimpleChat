@@ -28,7 +28,7 @@ const Footer: React.FC= () => {
 	// Получение сообщений
 
 	useEffect(() => {
-		webSocket.current = new WebSocket('http://backend:8000/api/messanger')
+		webSocket.current = new WebSocket('https://web-server/api/messanger')
 
 		webSocket.current.onopen = () => console.log("WebSocket opened")
 		webSocket.current.onclose = () => console.log("WebSocket closed")

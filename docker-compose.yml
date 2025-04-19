@@ -22,7 +22,7 @@ services:
     container_name: simple_chat_nginx
     restart: always
     volumes:
-      - /etc/letsencrypt/live/fredcv.ru:/etc/nginx/ssl/:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     ports:
       - "127.0.0.1:8802:443"
     networks:
