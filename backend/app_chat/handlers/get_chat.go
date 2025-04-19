@@ -5,15 +5,15 @@ import (
 
 	echo "github.com/labstack/echo/v4"
 
-	coreValidator "SimpleChat/backend/core/validator"
 	"SimpleChat/backend/app_chat/serializers"
 	"SimpleChat/backend/core/db"
 	"SimpleChat/backend/core/db/models"
 	"SimpleChat/backend/core/services"
+	coreValidator "SimpleChat/backend/core/validator"
 )
 
-
 // эндпоинт для получения чата
+//
 //	@Summary		Get chat
 //	@Description	Get chat messages and chat participants by chat uuid in path parameters
 //	@Router			/chat/{id} [get]
@@ -32,7 +32,7 @@ func GetChat(context echo.Context) error {
 	var dataIn serializers.GetChatIn
 	var chatFromDB models.Chat
 
-	// парсинг path-параметров 
+	// парсинг path-параметров
 	if err = context.Bind(&dataIn); err != nil {
 		return err
 	}

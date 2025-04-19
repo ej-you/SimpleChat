@@ -3,15 +3,14 @@ package serializers
 import (
 	"encoding/json"
 
-	echo "github.com/labstack/echo/v4"
 	validate "github.com/gobuffalo/validate/v3"
 	"github.com/google/uuid"
+	echo "github.com/labstack/echo/v4"
 
 	"SimpleChat/backend/core/db"
 	"SimpleChat/backend/core/db/models"
 	coreValidator "SimpleChat/backend/core/validator"
 )
-
 
 // входные данные для получения чата для двух юзеров и сообщений из этого чата
 type GetChatIn struct {
@@ -20,39 +19,30 @@ type GetChatIn struct {
 }
 
 // дополнительная валидация входных данных
-func (self *GetChatIn) IsValid(errors *validate.Errors) {}
-
-
-
-
-
-
-
+func (chat *GetChatIn) IsValid(errors *validate.Errors) {}
 
 // входные данные отправки сообщения через WebSocket
 type MessageIn struct {
-	ChatID 	uuid.UUID `json:"chatId" myvalid:"required" example:"0aafe1fd-0088-455b-9269-0307aae15bcc"`
-	Content	string `json:"content" myvalid:"required" example:"sample message"`
+	ChatID  uuid.UUID `json:"chatId" myvalid:"required" example:"0aafe1fd-0088-455b-9269-0307aae15bcc"`
+	Content string    `json:"content" myvalid:"required" example:"sample message"`
 }
 
 // дополнительная валидация входных данных
-func (self *MessageIn) IsValid(errors *validate.Errors) {}
-
+func (mes *MessageIn) IsValid(errors *validate.Errors) {}
 
 // десериализация сырого сообщения в структуру и её валидация
-func (self *MessageIn) ParseAndValidate(rowMessage []byte) error {
+func (mes *MessageIn) ParseAndValidate(rowMessage []byte) error {
 	// десериализация сообщения
-	err := json.Unmarshal(rowMessage, self)
+	err := json.Unmarshal(rowMessage, mes)
 	if err != nil {
 		return echo.NewHTTPError(400, map[string]string{"message": "failed to parse JSON from message: " + err.Error()})
 	}
 	// валидация сообщения
-	if err = coreValidator.Validate(self); err != nil {
+	if err = coreValidator.Validate(mes); err != nil {
 		return err
 	}
 	return nil
 }
-
 
 // получение второго участника чата
 func GetChatParticipantUUID(chatUUID, firstParticipantUUID uuid.UUID) (uuid.UUID, error) {
