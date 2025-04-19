@@ -13,33 +13,28 @@ services:
     expose:
       - "8000"
     networks:
-      proj_network:
-        ipv4_address: 172.16.1.5
+      main:
 
-  web_server:
+  web-server:
     build:
       context: .
       dockerfile: ./web_server/Dockerfile
     container_name: simple_chat_nginx
     restart: always
     volumes:
-      - /etc/ssl/my_certs:/etc/nginx/ssl/:ro
+      - /etc/letsencrypt/live/fredcv.ru:/etc/nginx/ssl/:ro
     ports:
-      - "80:80"
-      - "443:443"
+      - "127.0.0.1:8802:443"
     networks:
-      proj_network:
-        ipv4_address: 172.16.1.6
+      main:
     depends_on:
       - backend
 
 
 networks:
-  proj_network:
+  main:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.16.1.0/24
+
 
 volumes:
   sqlite-db:
