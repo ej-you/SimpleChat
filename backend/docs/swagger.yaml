@@ -444,6 +444,7 @@ produces:
 - application/json
 schemes:
 - http
+- https
 securityDefinitions:
   CookieAuth:
     description: JWT security token. Cookie is automatic added after auth is done

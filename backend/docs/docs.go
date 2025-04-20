@@ -657,7 +657,7 @@ var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "fredcv.ru:8091",
 	BasePath:         "/simple-chat/api",
-	Schemes:          []string{"http"},
+	Schemes:          []string{"http", "https"},
 	Title:            "SimpleChat Go API",
 	Description:      "This is a SimpleChat API written on Golang using Echo and Gorilla WebSocket.",
 	InfoInstanceName: "swagger",

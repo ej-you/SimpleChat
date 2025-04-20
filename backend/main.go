@@ -24,7 +24,7 @@ import (
 //	@Host						127.0.0.1:8000
 //	@Host						fredcv.ru:8091
 //	@BasePath					/simple-chat/api
-//	@Schemes					http
+//	@Schemes					http https
 //	@Accept						json
 //	@Produce					json
 //	@SecurityDefinitions.apiKey	CookieAuth
