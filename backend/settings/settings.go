@@ -17,7 +17,7 @@ var _ error = godotenv.Load("./.env")
 var Port string = os.Getenv("GO_PORT")
 var SecretForJWT string = os.Getenv("SECRET")
 
-const WebsocketURLPath = "/api/messanger"
+const WebsocketURLPath = "/simple-chat/api/messanger"
 const WebsocketPongWait = time.Second * 60
 const WebsocketPingPeriod = WebsocketPongWait * 9 / 10
 
