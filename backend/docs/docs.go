@@ -555,6 +555,10 @@ const docTemplate = `{
         "models.Message": {
             "type": "object",
             "properties": {
+                "chatId": {
+                    "description": "id чата",
+                    "type": "string"
+                },
                 "content": {
                     "description": "текст сообщения",
                     "type": "string",
@@ -642,7 +646,7 @@ const docTemplate = `{
         "CookieAuth": {
             "description": "JWT security token. Cookie is automatic added after auth is done (login/register).",
             "type": "apiKey",
-            "name": "auth",
+            "name": "simple-chat-auth",
             "in": "cookie"
         }
     }
@@ -651,8 +655,8 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "150.241.82.68",
-	BasePath:         "/api",
+	Host:             "fredcv.ru:8091",
+	BasePath:         "/simple-chat/api",
 	Schemes:          []string{"http"},
 	Title:            "SimpleChat Go API",
 	Description:      "This is a SimpleChat API written on Golang using Echo and Gorilla WebSocket.",

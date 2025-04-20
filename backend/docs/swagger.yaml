@@ -1,4 +1,4 @@
-basePath: /api
+basePath: /simple-chat/api
 consumes:
 - application/json
 definitions:
@@ -220,6 +220,9 @@ definitions:
     type: object
   models.Message:
     properties:
+      chatId:
+        description: id чата
+        type: string
       content:
         description: текст сообщения
         example: sample message
@@ -280,7 +283,7 @@ definitions:
         example: 0aafe1fd-0088-455b-9269-0307aae15bcc
         type: string
     type: object
-host: 150.241.82.68
+host: fredcv.ru:8091
 info:
   contact: {}
   description: This is a SimpleChat API written on Golang using Echo and Gorilla WebSocket.
@@ -446,6 +449,6 @@ securityDefinitions:
     description: JWT security token. Cookie is automatic added after auth is done
       (login/register).
     in: cookie
-    name: auth
+    name: simple-chat-auth
     type: apiKey
 swagger: "2.0"

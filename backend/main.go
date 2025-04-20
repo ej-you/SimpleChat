@@ -22,8 +22,8 @@ import (
 //	@Version					1.0
 //	@Description				This is a SimpleChat API written on Golang using Echo and Gorilla WebSocket.
 //	@Host						127.0.0.1:8000
-//	@Host						150.241.82.68
-//	@BasePath					/api
+//	@Host						fredcv.ru:8091
+//	@BasePath					/simple-chat/api
 //	@Schemes					http
 //	@Accept						json
 //	@Produce					json

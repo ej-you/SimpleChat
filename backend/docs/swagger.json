@@ -15,8 +15,8 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "150.241.82.68",
-    "basePath": "/api",
+    "host": "fredcv.ru:8091",
+    "basePath": "/simple-chat/api",
     "paths": {
         "/chat/with/{username}": {
             "get": {
@@ -552,6 +552,10 @@
         "models.Message": {
             "type": "object",
             "properties": {
+                "chatId": {
+                    "description": "id чата",
+                    "type": "string"
+                },
                 "content": {
                     "description": "текст сообщения",
                     "type": "string",
@@ -639,7 +643,7 @@
         "CookieAuth": {
             "description": "JWT security token. Cookie is automatic added after auth is done (login/register).",
             "type": "apiKey",
-            "name": "auth",
+            "name": "simple-chat-auth",
             "in": "cookie"
         }
     }

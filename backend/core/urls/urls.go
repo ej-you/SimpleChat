@@ -10,12 +10,14 @@ import (
 
 // подгрузка urls каждого микроприложения и их общая настройка
 func InitURLRouters(echoApp *echo.Echo) {
-	apiUserGroup := echoApp.Group("/simple-chat/api/user")
+	appGroup := echoApp.Group("/simple-chat/api")
+
+	apiUserGroup := appGroup.Group("/user")
 	userUrls.RouterGroup(apiUserGroup)
 
-	apiChatGroup := echoApp.Group("/simple-chat/api/chat")
+	apiChatGroup := appGroup.Group("/chat")
 	chatUrls.RouterGroup(apiChatGroup)
 
-	apiMessangerGroup := echoApp.Group("/simple-chat/api/messanger")
+	apiMessangerGroup := appGroup.Group("/messanger")
 	messangerUrls.RouterGroup(apiMessangerGroup)
 }
