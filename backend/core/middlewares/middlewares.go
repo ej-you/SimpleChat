@@ -11,7 +11,7 @@ import (
 // middleware для распаковки содержимого токена в содержимое context'а запроса и валидации токена
 var AuthMiddleware echo.MiddlewareFunc = echoJWT.WithConfig(echoJWT.Config{
 	SigningKey:  []byte(settings.SecretForJWT),
-	TokenLookup: "cookie:auth",
+	TokenLookup: "cookie:simple-chat-auth",
 	// ErrorHandler: coreErrorHandler.CustomJWTErrorHandler,
 	ErrorHandler: func(_ echo.Context, err error) error {
 		return coreErrorHandler.CustomJWTErrorHandler(err)
