@@ -53,6 +53,10 @@ func main() {
 	// кастомизация логирования
 	echoApp.Use(echoMiddleware.LoggerWithConfig(echoMiddleware.LoggerConfig{
 		Format: settings.LogFmt,
+		// пропуск логирования запроса на WebSocket-соединение
+		Skipper: func(ctx echo.Context) bool {
+			return ctx.Path() == settings.WebsocketURLPath
+		},
 	}))
 	// отлавливание паник для беспрерывной работы сервиса
 	echoApp.Use(echoMiddleware.Recover())
@@ -61,18 +65,15 @@ func main() {
 	echoApp.Use(echoMiddleware.CORSWithConfig(echoMiddleware.CORSConfig{
 		AllowOrigins:     settings.CorsAllowedOrigins,
 		AllowMethods:     settings.CorsAllowedMethods,
-		AllowHeaders:     []string{"Content-Type", "Authorization", "Upgrade", "Sec-WebSocket-Protocol", "Sec-WebSocket-Key", "Sec-WebSocket-Version"},
+		AllowHeaders:     []string{"Content-Type", "Authorization", "Connection", "Upgrade", "Sec-WebSocket-Protocol", "Sec-WebSocket-Key", "Sec-WebSocket-Version"},
 		AllowCredentials: true,
 	}))
 
 	// настройка таймаута для всех HTTP запросов на 20 секунд
 	echoApp.Use(echoMiddleware.TimeoutWithConfig(echoMiddleware.TimeoutConfig{
-		// пропускаем использование этого middleware для WebSocket соединения
-		Skipper: func(context echo.Context) bool {
-			if context.Request().URL.Path == settings.WebsocketURLPath {
-				return true
-			}
-			return false
+		// пропускаем использование этого middleware для WebSocket-соединения
+		Skipper: func(ctx echo.Context) bool {
+			return ctx.Path() == settings.WebsocketURLPath
 		},
 		ErrorMessage: "timeout error",
 		Timeout:      settings.TimeoutForTimeoutMiddleware,
